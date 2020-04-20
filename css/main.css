@@ -523,8 +523,8 @@ blockquote > * + * { margin-top: 1.5rem; }
 @media screen and (min-width: 60rem) { .other-posts { display: flex; justify-content: space-between; align-items: stretch; }
   .other-posts a { display: inline-block; width: 33.333%; margin-bottom: 0; } }
 
-.mobile-only { display: block; }
+@media screen and (max-width: 60rem) { .mobile-only { display: block !important; } }
 
-@media screen and (min-width: 60rem) { .mobile-only { display: none; } }
+@media screen and (min-width: 60rem) { .mobile-only { display: none !important; } }
 
 /*# sourceMappingURL=main.css.map */
