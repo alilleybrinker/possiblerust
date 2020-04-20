@@ -142,7 +142,7 @@ blockquote > * + * { margin-top: 1.5rem; }
   .site .site-header { padding-top: 1.5rem; margin-top: 1.5rem; order: 2; margin-bottom: -1.5rem; }
   .site .site-content { order: 1; } }
 
-@media screen and (min-width: 60rem) { .site { max-width: 80%; padding: 6rem 0; margin: 0 auto; }
+@media screen and (min-width: 60rem) { .site { max-width: 64rem; padding: 6rem 0; margin: 0 auto; }
   .site .site-body { display: flex; justify-content: space-between; align-items: stretch; }
   .site .site-header { display: block; flex: 0 0 30%; margin-right: 3rem; }
   .site .site-content { flex: 1; } }
