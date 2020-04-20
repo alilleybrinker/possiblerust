@@ -136,9 +136,9 @@ blockquote > * + * { margin-top: 1.5rem; }
 
 .button span, .button:visited span { display: block; font-size: 0.667rem; line-height: 1.5em; font-weight: 500; }
 
-.mobile-only { display: none; }
+.mobile-only { display: block; }
 
-@media screen and (max-width: 60rem) { .mobile-only { display: block; } }
+@media screen and (min-width: 60rem) { .mobile-only { display: none; } }
 
 .site { padding: 3rem 1.5rem; }
 
