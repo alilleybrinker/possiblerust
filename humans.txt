@@ -1,0 +1,24 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Andrew Lilley Brinker -- Site Creator -- @alilleybrinker
+
+# THANKS
+
+    Alyssa Lilley Brinker
+    Bonnabelle Susanne ("Bonnie") Lilley Brinker
+    Steve Klabnik
+    Carol Nichols
+    The Rust Community
+    Graydon Hoare
+
+# TECHNOLOGY COLOPHON
+
+    CSS3
+    HTML5
+    Normalize.css
+    Inter Font
+    HTML5 Boilerplate
+    Jekyll

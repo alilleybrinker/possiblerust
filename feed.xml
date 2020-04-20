@@ -1,0 +1,829 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://possiblerust.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://possiblerust.com/" rel="alternate" type="text/html" /><updated>2020-04-19T19:48:04-07:00</updated><id>https://possiblerust.com/feed.xml</id><title type="html">Possible Rust</title><subtitle>A blog about what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Fast and Simple Rust Interner</title><link href="https://possiblerust.com/community/interning-in-rust" rel="alternate" type="text/html" title="Fast and Simple Rust Interner" /><published>2020-03-22T14:34:15-07:00</published><updated>2020-03-22T14:34:15-07:00</updated><id>https://possiblerust.com/community/interning-in-rust</id><content type="html" xml:base="https://possiblerust.com/community/interning-in-rust">&lt;blockquote&gt;
+  &lt;p&gt;This post describes a simple technique for writing interners in Rust which I haven’t seen documented before.&lt;/p&gt;
+
+  &lt;p&gt;String interning is a classical optimization when you have to deal with many equal strings. The canonical example would be a compiler: most identifiers in a program are repeated several times.&lt;/p&gt;
+
+  &lt;p&gt;Interning works by ensuring that there’s only one canonical copy of each distinct string in memory. It can give the following benefits:&lt;/p&gt;
+
+  &lt;ul&gt;
+    &lt;li&gt;Less memory allocated to hold strings.&lt;/li&gt;
+    &lt;li&gt;If all strings are canonicalized, comparison can be done in O(1) (instead of O(n)) by using pointer equality.&lt;/li&gt;
+    &lt;li&gt;Interned strings themselves can be represented with an index (buddy u32) instead of a (ptr, len) pair. This makes data structures which embed strings more compact.&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A good introduction to string interning and what it looks like in Rust.&lt;/p&gt;
+
+&lt;!-- more --&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">This post describes a simple technique for writing interners in Rust which I haven’t seen documented before. String interning is a classical optimization when you have to deal with many equal strings. The canonical example would be a compiler: most identifiers in a program are repeated several times. Interning works by ensuring that there’s only one canonical copy of each distinct string in memory. It can give the following benefits: Less memory allocated to hold strings. If all strings are canonicalized, comparison can be done in O(1) (instead of O(n)) by using pointer equality. Interned strings themselves can be represented with an index (buddy u32) instead of a (ptr, len) pair. This makes data structures which embed strings more compact. A good introduction to string interning and what it looks like in Rust.</summary></entry><entry><title type="html">Rust 2018</title><link href="https://possiblerust.com/community/rust-2018" rel="alternate" type="text/html" title="Rust 2018" /><published>2018-01-07T13:34:15-08:00</published><updated>2018-01-07T13:34:15-08:00</updated><id>https://possiblerust.com/community/rust-2018</id><content type="html" xml:base="https://possiblerust.com/community/rust-2018">&lt;p&gt;In this post I share a few small thoughts on what Rust should do in 2018, and more broadly about the current direction of the language.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;tooling&quot;&gt;Tooling&lt;/h2&gt;
+
+&lt;h3 id=&quot;a-lifetime-visualizer&quot;&gt;A Lifetime Visualizer&lt;/h3&gt;
+
+&lt;p&gt;Rust should have a lifetime visualizer.&lt;/p&gt;
+
+&lt;p&gt;What I mean by this is a tool that takes in some Rust program, and outputs a visual representation of that program’s control flow graph, and allows visualization of values’ lifetimes using that graph.&lt;/p&gt;
+
+&lt;p&gt;In the days of lexical lifetimes, the need for a tool like this wasn’t there. One could trace out the lifetime from the lexical structure of the program. With the rise of non-lexical lifetimes, there are a growing number cases where lifetimes may not what one expects based on the lexical structure alone.&lt;/p&gt;
+
+&lt;p&gt;I am not familiar enough with MIR to know how hard it would be to take MIR (which is, as I understand it, a control-flow graph representation of a Rust program) and visualize it. It may be that this is intractably hard, or that the amount of work it would take is enough to make this tool not doable in the next year. But hey, it seems like a good idea. 😄&lt;/p&gt;
+
+&lt;h2 id=&quot;documentation&quot;&gt;Documentation&lt;/h2&gt;
+
+&lt;h3 id=&quot;better-language-around-lifetimes&quot;&gt;Better Language Around Lifetimes&lt;/h3&gt;
+
+&lt;p&gt;One common source of confusion I’ve found is that many writings about Rust, or explanations people offer about Rust, do not adequately differentiate between “lifetimes” and “lifetime variables.”&lt;/p&gt;
+
+&lt;p&gt;A “lifetime” is how long a particular piece of data is accessible within the program (the time between its definition and it going out of scope and its underlying memory being reclaimed).&lt;/p&gt;
+
+&lt;p&gt;A “lifetime variable” is a constraint on a type, trait, or function. Many of these are boilerplate to say “yes, I recognize that this piece of input data will only live a certain amount of time.” Sometimes you will constraints placed on lifetimes to say, for example: “the lifetime of some data A is larger than some data B.”&lt;/p&gt;
+
+&lt;p&gt;These two terms clearly mean substantially different things, one is a concrete attribute of a piece of data, the other is a constraint used to verify safety. I don’t know if we need new terms, or just to be more careful with the terms we do use, but it certainly feels like a place we fall down a lot right now.&lt;/p&gt;
+
+&lt;h2 id=&quot;things-i-dont-care-about-as-much&quot;&gt;Things I Don’t Care About As Much&lt;/h2&gt;
+
+&lt;p&gt;Rust compiling into WebAssembly seems cool. It also seems a bit like the sort of nerd-sniping coolness that draws work away from more urgent areas. I like JavaScript, I like the web, and I like WebAssembly. I don’t want any of these to be take to imply in any way that the web isn’t a valid and massively important platform, or that those who are interested in or work on the web aren’t serious engineers. My sole concern is that the Rust/WebAssembly world is getting more attention than it is worth. But hey, at the same time, people can do what they please, and people aren’t utility optimizers. Work on what you want to work on. ❤️&lt;/p&gt;
+
+&lt;h2 id=&quot;things-i-am-worried-about&quot;&gt;Things I Am Worried About&lt;/h2&gt;
+
+&lt;p&gt;The open question of unsoundness in the interaction between specialization and lifetimes (&lt;a href=&quot;https://github.com/rust-lang/rust/issues/40582&quot;&gt;issue #40582&lt;/a&gt;) is… worrisome. It sounds like there was some initial hope that this would be inherently fixed by Chalk, but it sounds like this has proven to be more complicated than expected. We’ll see where it lands.&lt;/p&gt;
+
+&lt;h2 id=&quot;funny-things&quot;&gt;Funny Things&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/rust-lang/rust/issues/29743&quot;&gt;This issue&lt;/a&gt;, marked as being hard to resolve on the Rust issue tracker, shows that there is some strange interaction of indexing and arithmetic which causes sensible code to be rejected by the compiler, but with an error message that doesn’t seem to make much sense. Sounds like it was expected that MIR would fix it, and it didn’t. It looks like has just recently been / is about to be resolved, which is good.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This post was largely about odds and ends, because I think Rust is on the right track already for 2018, and should largely stay the course. There’s always lots of work on the margins, and lots of cool ideas that may never be fixed. All in all, Rust is in a good position, and I am excited for 2018!&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">In this post I share a few small thoughts on what Rust should do in 2018, and more broadly about the current direction of the language.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://possiblerust.com/2018.png" /><media:content medium="image" url="https://possiblerust.com/2018.png" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Setting Expectations for Rust’s Difficulty</title><link href="https://possiblerust.com/community/setting-expectations-for-rusts-difficulty" rel="alternate" type="text/html" title="Setting Expectations for Rust's Difficulty" /><published>2017-01-26T16:08:03-08:00</published><updated>2017-01-26T16:08:03-08:00</updated><id>https://possiblerust.com/community/setting-expectations-for-rusts-difficulty</id><content type="html" xml:base="https://possiblerust.com/community/setting-expectations-for-rusts-difficulty">&lt;p&gt;In this post I discuss the experiences of people coming to Rust from other languages. What their expectations generally are, how Rust meets or doesn’t meet those expectations, and how Rust might do better both at meeting those expectations, and at helping new users to calibrate expectations appropriately.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;There have been several &lt;a href=&quot;https://ayende.com/blog/176801/the-struggle-with-rust&quot;&gt;blog&lt;/a&gt; &lt;a href=&quot;https://blog.ntpsec.org/2017/01/18/rust-vs-go.html&quot;&gt;posts&lt;/a&gt; of late with potential Rust users trying out the language, and deciding it isn’t for them. This is absolutely fine. Rust cannot be everything to everyone. The design decisions Rust makes make it more suitable for certain contexts than others. Making a decision not to use Rust based on a mismatch of language purpose and area of development interest is an entirely reasonable thing to do.&lt;/p&gt;
+
+&lt;p&gt;But in some of these posts, the authors comment on the amount of time necessary to get from a point of knowing no Rust at all to being able to program whatever it is they want to program (often characterized by the author as simple). I believe that the problem is not that Rust is unreasonably hard (although I do think there are things to be improved), but that Rust does not set expectations appropriately.&lt;/p&gt;
+
+&lt;p&gt;I do think there are certain ergonomic pain points in Rust today. In fact, the Rust teams are well aware of these points, and there is a concerted effort over the next year to address these. These include the introduction of &lt;a href=&quot;http://smallcultfollowing.com/babysteps/blog/2016/04/27/non-lexical-lifetimes-introduction/&quot;&gt;non-lexical lifetimes&lt;/a&gt;, to make the borrow checker smarter, and reduce the likelihood of a situation where the code is actually correct, but the borrow checker is too dumb to tell. There are also discussions happening around auto-dereferencing in match expressions, making matching on a reference simpler, or on improving the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;str&lt;/code&gt;/&lt;code class=&quot;highlighter-rouge&quot;&gt;String&lt;/code&gt; confusion, to make string usage easier for new Rust programmers.&lt;/p&gt;
+
+&lt;p&gt;However, I also think there is a certain degree of fundamental complexity in the mix of performance and safety that Rust provides, and that the onus is then on Rust to better communicate to potential users the degree of difficulty they should expect.&lt;/p&gt;
+
+&lt;p&gt;In doing this, it is important to note that programmers come to Rust from a variety of languages. Broadly, these can be grouped into three categories, and programmers coming from each of the three categories experience different issues, appreciate different features, and have different expectations about Rust.&lt;/p&gt;
+
+&lt;p&gt;The three groups are:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;C &amp;amp; C++ programmers. I would say “systems” programmers, but the phrase is too overloaded to be particularly meaningful in comparative programming language discussions. C &amp;amp; C++ programmers tend to appreciate the additional safety that Rust can provide, but at the same time seem to have an expectation that Rust will be easier for them than it actually is. While it is true that Rust offers the same degree of performance that these two languages offer, and that it has (largely to avoid spending the weirdness budget frivolously) syntax similar to C, it is in reality a language of a substantial degree of difference. I think C and C++ programmers, in general, do not expect this, and are thus frustrated when Rust turns out to be harder than expected.&lt;/li&gt;
+  &lt;li&gt;Ruby, Python, Java, and other garbage collected imperative / OO languages. Programmers coming from these languages tend to like that Rust is faster, and appreciate the functional-like features it brings (functional or functional-like programming becoming hotter in these circles). For some, Rust feels like the first low-level programming language that they can understand. It opens up domains that may have otherwise been inaccessible, and feels generally empowering.&lt;/li&gt;
+  &lt;li&gt;Haskell, OCaml, and other functional languages. These programmers appreciate Rust for the performance and power of it, while feeling comfortable with the design ideas that Rust has blatantly stolen from them. Rust’s original compiler was written in OCaml, and the influence of the language remains in some places. Rust’s trait system is essentially a copy of Haskell’s typeclass system (with &lt;a href=&quot;https://www.rust-lang.org/en-US/faq.html#how-do-rust-traits-compare-to-haskell-typeclasses&quot;&gt;some caveats&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Essentially, the second two groups of programmers expect Rust to be hard, because it is low-level and systems-y and generally a little strange. And Rust is hard, but often not as hard as they seem to expect once they get going with it.&lt;/p&gt;
+
+&lt;p&gt;On the other hand, C and C++ programmers tend to expect Rust to be easy, and it isn’t. While it has the trappings of something familiar, the experience of Rust for C and C++ programmers is death by a thousand surprises. Rust traits and C++ templates bind differently. Rust defaults to moves, while C++ defaults to copies. The borrow checker is strange and alien and (they often seem to think) usually wrong (in my experience, the borrow checker is very rarely wrong. If you think it is, check your work first).&lt;/p&gt;
+
+&lt;p&gt;This mismatch between expectation and reality creates a lot of frustration for C and C++ programmers, who often end up choosing to ditch Rust altogether, and who sometimes write blog posts about their experience.&lt;/p&gt;
+
+&lt;p&gt;Now, all of this can sound like I am putting the blame squarely on the shoulders of these programmers. I am not. Rust doesn’t do a good enough job of on-boarding new programmers. This is mostly because on-boarding is really difficult, and the current edition of the Rust book was written very quickly in the run-up to 1.0. There have been improvements since then, but it is still a more limited document than is really desired.&lt;/p&gt;
+
+&lt;p&gt;Good news though! There is a new edition of the Rust book in the works, being written by Steve Klabnik and Carol Nichols. You can &lt;a href=&quot;https://github.com/rust-lang/book&quot;&gt;read it yourself on GitHub&lt;/a&gt;, it is excellent, and it will be published by No Starch Press when it’s finished (yay!).&lt;/p&gt;
+
+&lt;p&gt;In addition, this year is the year of productivity in Rust. Last year the Rust teams put together a survey of Rust and potential Rust programmers, and the &lt;a href=&quot;https://blog.rust-lang.org/2016/06/30/State-of-Rust-Survey-2016.html&quot;&gt;results of that survey&lt;/a&gt; have directly informed &lt;a href=&quot;https://github.com/rust-lang/rfcs/blob/master/text/1774-roadmap-2017.md&quot;&gt;the priorities for the next year&lt;/a&gt;. The focus now is on executing on those priorities and addressing the major pain points people identified. These are the same pain points people coming to Rust from other languages often bring up in explaining why they’ve chosen not to use Rust. We’re listening, and things are improving.&lt;/p&gt;
+
+&lt;p&gt;In the meantime, how can we improve the on-boarding experience, particularly for C and C++ programmers who seem so often frustrated by Rust? The first path may be by speaking more directly to them. I know there is a book in the works right now, &lt;a href=&quot;http://shop.oreilly.com/product/0636920040385.do&quot;&gt;to be published by O’Reilly&lt;/a&gt;, that introduces Rust to C++ programmers. Additionally, having more C and C++ programmers writing about their experience with Rust would likely be of value, both as a form of social proof, and to more directly address the particular issues people coming from those languages have.&lt;/p&gt;
+
+&lt;p&gt;But none of these solutions addresses the core question of setting the expectation of difficulty. I am not sure what the answer is here. Perhaps directing new Rust users to &lt;a href=&quot;https://doc.rust-lang.org/book/&quot;&gt;The Rust Programming Language&lt;/a&gt; book more forcefully. Perhaps encouraging more programmers to reach out on &lt;a href=&quot;https://www.rust-lang.org/en-US/community.html#irc-channels&quot;&gt;IRC&lt;/a&gt; or &lt;a href=&quot;https://www.rust-lang.org/en-US/community.html#discussion-forums&quot;&gt;other&lt;/a&gt; &lt;a href=&quot;https://users.rust-lang.org/&quot;&gt;channels&lt;/a&gt;, where individuals can more directly answer their questions and assuage their concerns. I’m curious to hear what other ideas people may have on this front.&lt;/p&gt;
+
+&lt;p&gt;As a final note, I will say that Rust is still a young language, and that a lot of the people contributing to it are volunteering to do so in their free time. It takes a long while to get high-quality stable libraries, build up institutional community knowledge and agreement about what libraries or patterns to use, and get the language into a state where you can use it as productively as you would use a long-standing language like Python or Java.&lt;/p&gt;
+
+&lt;p&gt;The Rust teams and contributors work really hard to actively address the issues people experience. Those (myself included) who’ve taken part in an issue, or pull request, or RFC can attest to how excellent the experience is. This is a great group, and they are doing their best to address the concerns potential users have with the language.&lt;/p&gt;
+
+&lt;p&gt;And hey, maybe in the end it’ll turn out that Rust just really isn’t for them. That’s alright. We can still be friends. &amp;lt;3&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">In this post I discuss the experiences of people coming to Rust from other languages. What their expectations generally are, how Rust meets or doesn’t meet those expectations, and how Rust might do better both at meeting those expectations, and at helping new users to calibrate expectations appropriately.</summary></entry><entry><title type="html">Monomorphization Bloat</title><link href="https://possiblerust.com/pattern/monomorphization-bloat" rel="alternate" type="text/html" title="Monomorphization Bloat" /><published>2016-12-03T10:38:20-08:00</published><updated>2016-12-03T10:38:20-08:00</updated><id>https://possiblerust.com/pattern/monomorphization-bloat</id><content type="html" xml:base="https://possiblerust.com/pattern/monomorphization-bloat">&lt;p&gt;In this post I will discuss monomorphization: what it is, why it’s useful, and
+what problems can potentially arise from it, with a particular focus on the
+problem of monomorphization bloat. I will also look at options for dealing with
+monomorphization bloat in your codebase.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;Monomorphization is a compilation strategy to allow polymorphism with static
+dispatch. To explain how it works, we’ll look at the following function:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do_the_thing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ... does the thing    &lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As you can see, this function takes in some type &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt;. This means we can call
+the function with any type, like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;8385.35&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;a string!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At compile time, the compiler sees that &lt;code class=&quot;highlighter-rouge&quot;&gt;do_the_thing&lt;/code&gt; is called with three
+different types: &lt;code class=&quot;highlighter-rouge&quot;&gt;i32&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;f64&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;str&lt;/code&gt;. So it creates three different
+functions based on &lt;code class=&quot;highlighter-rouge&quot;&gt;do_the_thing&lt;/code&gt;, replacing the general &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt; type with
+each of the three concrete types the function is actually called with. In
+the end, you get something like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;do_the_thing_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ... do the thing, with an i32!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;do_the_thing_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ... do the thing, with an f64!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;do_the_thing_3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ... do the thing, with a &amp;amp;str!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;42&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing_2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;8385.35&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;do_the_thing_3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;a string!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is monomorphization! The generated code is equivalent to you having
+written three different functions, but you didn’t have to actually write
+three functions! This is really cool, as writing the general version is
+a lot less work than writing a version for every concrete type you’ll
+use, and a lot more flexible too.&lt;/p&gt;
+
+&lt;h2 id=&quot;bloat&quot;&gt;Bloat&lt;/h2&gt;
+
+&lt;p&gt;The downside is that, by generating these functions, you potentially add
+bloat to the resulting binary. If you have a function with size &lt;code class=&quot;highlighter-rouge&quot;&gt;n&lt;/code&gt;, and
+it’s called with &lt;code class=&quot;highlighter-rouge&quot;&gt;m&lt;/code&gt; number of concrete types, it’ll have a size of
+&lt;code class=&quot;highlighter-rouge&quot;&gt;n×m&lt;/code&gt; in the resulting binary! In some contexts, a large binary size can
+be a problem.&lt;/p&gt;
+
+&lt;p&gt;Thankfully, there are several options to deal with this. In my last post,
+I talked about a small conversion trick using &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&lt;/code&gt;. This is a fairly
+common trick in the Rust world, and can if you’re not careful cause
+the monomorphization bloat problem we’re discussing here. But imagine
+you have something like the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;big_function&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Into&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// This is a giant function with hundreds of lines!&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// And it gets called with a lot of concrete types!&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// Oh no!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The way monomorphization works, the entire body of the function gets copied.
+But in the case of conversion traits like &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&amp;lt;T&amp;gt;&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;From&amp;lt;T&amp;gt;&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;AsRef&amp;lt;T&amp;gt;&lt;/code&gt;,
+&lt;code class=&quot;highlighter-rouge&quot;&gt;Borrow&amp;lt;T&amp;gt;&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;ToString&lt;/code&gt;, you can actually separate the part that needs to
+be monomorphized from the rest of the function like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;big_function&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Into&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i32&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.into&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;mi&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;big_function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;big_function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// This is where all the rest of the original function body is now!&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;By splitting out the conversion code from the function, you keep the part that
+the compiler will monomorphize, and thereby duplicate, quite small. This helps
+to keep the size of the resulting binary down.&lt;/p&gt;
+
+&lt;p&gt;Alternatively, you can remove the conversion trait abstraction, and instead
+require callers to do the conversion themselves before calling the function.
+This may make the API a little more tedious to use, but it avoids the potential
+problem of bloat by not requiring monomorphization at all.&lt;/p&gt;
+
+&lt;p&gt;Additionally, you can always try to shrink the sizes of your functions by
+refactoring. A big function is probably a sign of something gone wrong anyway.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I don’t say any of this to encourage you not to use trait bounds or not to
+use some of the conversion trait niceties in your API. Generics and static
+dispatch are an important part of Rust, and it would be silly not to take
+advantage of these features. Just keep in mind the potential for bloat, and
+keep an eye on the size of your binary. If it grows too large and becomes a
+problem, hopefully you will be better equipped to understand what is happening,
+and to correct it.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Generics" /><summary type="html">In this post I will discuss monomorphization: what it is, why it’s useful, and what problems can potentially arise from it, with a particular focus on the problem of monomorphization bloat. I will also look at options for dealing with monomorphization bloat in your codebase.</summary></entry><entry><title type="html">The “Into Option” Trick</title><link href="https://possiblerust.com/pattern/the-into-trick" rel="alternate" type="text/html" title="The &amp;ldquo;Into Option&amp;rdquo; Trick" /><published>2016-11-29T20:30:41-08:00</published><updated>2016-11-29T20:30:41-08:00</updated><id>https://possiblerust.com/pattern/the-into-trick</id><content type="html" xml:base="https://possiblerust.com/pattern/the-into-trick">&lt;p&gt;In this post I will talk about an interesting and useful addition to the
+Rust standard library in version 1.12.0. One which allows for an interesting
+API improvement to existing libraries, without harming backwards compatibility
+if libraries decide to use it.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;A fun little feature was quietly added to Rust in version 1.12, in the form
+of the following trait implementation:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;From&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;nf&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;While this may seem innocuous, this little trait implementation allows for a
+really pleasing new API trick. To explain, let’s look at a function that takes
+in an optional parameter. (Note: this function is taken from &lt;a href=&quot;https://github.com/rust-lang/rust/pull/34828&quot; title=&quot;The pull request that introduced this new trait implementation.&quot;&gt;the pull request&lt;/a&gt;
+that introduced this new feature.)&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;u32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// x is defined somewhere in here...&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This function looks fine, except it’s a little annoying to have to wrap the numbers
+in &lt;code class=&quot;highlighter-rouge&quot;&gt;Some&lt;/code&gt;. Wouldn’t it be nice if you didn’t have to do that? Enter the new trait
+implementation. You see, in the Rust standard library there exist two conversion
+traits that are the dual of each other: &lt;code class=&quot;highlighter-rouge&quot;&gt;From&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&lt;/code&gt;. If you implement &lt;code class=&quot;highlighter-rouge&quot;&gt;From&lt;/code&gt;,
+you get the implementation of &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&lt;/code&gt; for free, thanks to the following blanket
+implementation in the standard library:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Into&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;where&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;From&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;into&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;nn&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That may seem a little crazy, but it just says that if a type &lt;code class=&quot;highlighter-rouge&quot;&gt;U&lt;/code&gt; implements &lt;code class=&quot;highlighter-rouge&quot;&gt;From&amp;lt;T&amp;gt;&lt;/code&gt;,
+then &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt; will automatically implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&amp;lt;U&amp;gt;&lt;/code&gt;. This means that for those two types,
+both of the following are valid:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;OriginalType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new_thing_1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;NewType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;original&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.into&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new_thing_2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;NewType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Back to the original idea: using this new trait implementation, you &lt;em&gt;can&lt;/em&gt; in fact
+write a new version of &lt;code class=&quot;highlighter-rouge&quot;&gt;set_read_timeout&lt;/code&gt; that is used like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.set_read_timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The new version of the function looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;set_read_timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Into&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;u32&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.into&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the new function, &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt; is some type that implements &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&amp;lt;Option&amp;lt;u32&amp;gt;&amp;gt;&lt;/code&gt;. Because of
+the new blanket trait implementation for &lt;code class=&quot;highlighter-rouge&quot;&gt;From&lt;/code&gt;, and the already in-place blanket trait
+implementation for &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&lt;/code&gt; (to automatically match any &lt;code class=&quot;highlighter-rouge&quot;&gt;From&lt;/code&gt; implementation), the set
+of types that meets &lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt;’s constraints includes &lt;code class=&quot;highlighter-rouge&quot;&gt;i32&lt;/code&gt; itself! In addition, &lt;code class=&quot;highlighter-rouge&quot;&gt;From&lt;/code&gt; (and
+therefore &lt;code class=&quot;highlighter-rouge&quot;&gt;Into&lt;/code&gt;) is implemented for any type to convert into itself, and so passing
+&lt;code class=&quot;highlighter-rouge&quot;&gt;None&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;Some&lt;/code&gt; still works the same as before. This means the new function header can
+be used as a drop-in replacement for the old version without any problems!&lt;/p&gt;
+
+&lt;p&gt;This is just a small trick that you can use to make your Rust APIs nicer. It’s may not
+make sense to use everywhere, but it’s something nice to reach for when it’s worthwhile.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Generics" /><summary type="html">In this post I will talk about an interesting and useful addition to the Rust standard library in version 1.12.0. One which allows for an interesting API improvement to existing libraries, without harming backwards compatibility if libraries decide to use it.</summary></entry><entry><title type="html">Unsafe Core, Safe Interface</title><link href="https://possiblerust.com/pattern/unsafe-core-safe-interface" rel="alternate" type="text/html" title="Unsafe Core, Safe Interface" /><published>2016-11-28T19:20:44-08:00</published><updated>2016-11-28T19:20:44-08:00</updated><id>https://possiblerust.com/pattern/unsafe-core-safe-interface</id><content type="html" xml:base="https://possiblerust.com/pattern/unsafe-core-safe-interface">&lt;p&gt;There is a common pattern in writing Rust libraries that seems to be asked about
+fairly often: the unsafe core + safe interface. The essence is that you write
+the core of your library using unsafe Rust (usually for performance, or because
+you’re wrapping FFI code) and then write safe Rust to provide a nice, safe
+interface for the unsafe core. In this post I am going to give a quick
+explanation of how this is done, and what the considerations are. If you’re
+looking for a greater degree of detail on this, check out
+&lt;a href=&quot;https://doc.rust-lang.org/nomicon/&quot; title=&quot;The Advanced Rust Programming Language&quot;&gt;The Advanced Rust Programming Language&lt;/a&gt; (also called The Rustonomicon).&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;Unsafe Rust exists to allow the Rust programmer to subvert Rust’s safety
+mechanisms, with the expectation that when the unsafe code ends, Rust’s safety
+guarantees are maintained. Unsafe Rust comes in three flavors: unsafe functions,
+unsafe blocks, and unsafe traits.&lt;/p&gt;
+
+&lt;p&gt;Unsafe functions are functions whose use allows the subversion of Rust’s safety
+guarantees. Unsafe blocks are blocks that call unsafe functions. Unsafe traits
+are a little different. To explain how, let’s talk a bit about what the relationship
+between unsafe Rust and safe Rust, in particular about trust.&lt;/p&gt;
+
+&lt;p&gt;Safe Rust &lt;em&gt;has to&lt;/em&gt; trust unsafe Rust to be correct. If it isn’t, there is no way
+to defend against it without using even more unsafe Rust. So safe Rust just has to
+trust that the author of the unsafe Rust has carefully ensured that Rust’s safety
+guarantees are maintained.&lt;/p&gt;
+
+&lt;p&gt;On the other hand, unsafe Rust can’t trust safe Rust. For example, if a piece of unsafe
+Rust relies on a type’s &lt;code class=&quot;highlighter-rouge&quot;&gt;PartialOrd&lt;/code&gt; implementation to ensure that Rust’s safety
+guarantees are maintained, that would be wrong. Because now, if the Rust programmer
+changes their safe code to have a bad &lt;code class=&quot;highlighter-rouge&quot;&gt;PartialOrd&lt;/code&gt; implementation, they can induce
+unsafety. This violates the expectation of how safe Rust should work. This means that
+unsafe Rust has to be written defensively, and can never trust that safe Rust is correct.&lt;/p&gt;
+
+&lt;p&gt;Unsafe traits are an answer to the question of how to handle generic interfaces in the
+world of unsafe Rust. Implementing an unsafe trait indicates that you’ve made sure
+that your implementation upholds whatever expectations exist for that trait to behave
+well. Because the trait and any implementations of it are unsafe, other unsafe Rust
+is free to trust that it is correct.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;One thing that may be surprising about unsafe Rust is that it is generally infectious
+toward anything in the same module. This is because Rust’s visibility rules give
+any code in the same module as a data type definition (an enum, struct, or what have
+you) access to the internal fields of that type. Obviously, for a data type with
+unsafe shenanigans happening, this could allow for subversion of Rust’s safety
+guarantees. So, when you’re writing unsafe, you keep the fiddly fields that the unsafe
+code touches hidden away as private fields, and provide only a nice safe API for external
+users of the module.&lt;/p&gt;
+
+&lt;figure class=&quot;&quot; id=&quot;figure-1&quot;&gt;
+    &lt;img src=&quot;/assets/img/bootcamp.png&quot; alt=&quot;A picture&quot; /&gt;
+    &lt;figcaption&gt;&lt;span&gt;Figure 1&lt;/span&gt; Some figure or something. &lt;a href=&quot;#figure-1&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;This is the key design idea when making types that use safe internally, and its this
+pattern that’s used throughout Rust’s standard collections.&lt;/p&gt;
+
+&lt;p&gt;But there are some times where you want to expose both an unsafe interface and a safe
+interface. Here, the pattern is a little different. For example, it is a very common
+thing to want to provide a Rust wrapper around some C API. For this, you use the Rust
+FFI (Foreign Function Interface), which requires that calls to C code be wrapped in
+unsafe (as the Rust compiler can’t guarantee that the C code hasn’t engaged in any
+sort of shenanigans). So you start by writing direct Rust analogues to the C code, with
+lots of &lt;code class=&quot;highlighter-rouge&quot;&gt;unsafe&lt;/code&gt; used throughout.&lt;/p&gt;
+
+&lt;figure class=&quot;full&quot; id=&quot;figure-2&quot;&gt;
+    &lt;img src=&quot;/assets/img/bootcamp.png&quot; alt=&quot;A picture&quot; /&gt;
+    &lt;figcaption&gt;&lt;span&gt;Figure 2&lt;/span&gt; Some figure or something. &lt;a href=&quot;#figure-2&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;aside id=&quot;aside-1&quot;&gt;
+    &lt;h4&gt;Aside #1: Example Aside &lt;a href=&quot;#aside-1&quot; class=&quot;aside-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;
+    
+&lt;p&gt;Here’s some content for the aside. It’s a bit long, to really test the aside and
+make sure it’s working the way we want it to. If it isn’t, we’ll need to make
+some changes.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Do a thing&lt;/li&gt;
+  &lt;li&gt;And some more.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/aside&gt;
+
+&lt;p&gt;Then, because the resulting code is usually not in the style of idiomatic Rust, and would
+likely be a pain to use, you write a nice API on top of this collection of unsafe wrappers.
+In the end, these two layers are often published as separate crates, with the unsafe
+wrapper crate name ending in &lt;code class=&quot;highlighter-rouge&quot;&gt;-sys&lt;/code&gt; (a little Rust community practice to indicate a C FFI
+crate). In this way, if users want just a nice Rust API to the C library, they use the
+cleaned up idiomatic crate. If they want to be down in the nitty-gritty, or do something
+not provided for in the higher-level API, they can easily move down to the unsafe wrapper
+crate.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;This has been a little bit about writing unsafe libraries in Rust; why do it, what to
+know and think about when doing it, and how it is often done. Hopefully this has clarified
+some questions for you. If you want to know more, read &lt;a href=&quot;https://doc.rust-lang.org/nomicon/&quot; title=&quot;The Advanced Rust Programming Language&quot;&gt;The Advanced Rust Programming Language&lt;/a&gt;,
+as it covers these issues far more completely than I have here.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Unsafe" /><summary type="html">There is a common pattern in writing Rust libraries that seems to be asked about fairly often: the unsafe core + safe interface. The essence is that you write the core of your library using unsafe Rust (usually for performance, or because you’re wrapping FFI code) and then write safe Rust to provide a nice, safe interface for the unsafe core. In this post I am going to give a quick explanation of how this is done, and what the considerations are. If you’re looking for a greater degree of detail on this, check out The Advanced Rust Programming Language (also called The Rustonomicon).</summary></entry><entry><title type="html">The Rust Community</title><link href="https://possiblerust.com/unpacking/the-rust-community" rel="alternate" type="text/html" title="The Rust Community" /><published>2016-05-28T19:38:20-07:00</published><updated>2016-05-28T19:38:20-07:00</updated><id>https://possiblerust.com/unpacking/the-rust-community</id><content type="html" xml:base="https://possiblerust.com/unpacking/the-rust-community">&lt;p&gt;I love the Rust community, I really do. Like I said in &lt;a href=&quot;http://www.suspectsemantics.com/blog/2016/05/25/joining-the-rust-community/&quot;&gt;my recent post about
+how to take part in it&lt;/a&gt;, I think the Rust community is one of the most
+consistently welcoming and friendly programming communities with which I’ve
+interacted. That being said, I think there are some problems with the way the
+Rust community presents itself and Rust to the outside world. In this post, I’d
+like to outline those problems, and some ideas for how the Rust community can
+be even better at explaining and pitching Rust to people who may not be sold on
+the idea yet.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;what-we-get-right&quot;&gt;What We Get Right&lt;/h2&gt;
+
+&lt;p&gt;The biggest thing I think the Rust community gets right is being helpful. There
+are a lot of places you can go for help in the Rust community (&lt;a href=&quot;https://www.rust-lang.org/community.html#irc-channels&quot;&gt;IRC&lt;/a&gt;, &lt;a href=&quot;https://users.rust-lang.org/&quot;&gt;the user forum&lt;/a&gt;, &lt;a href=&quot;https://www.reddit.com/r/rust&quot;&gt;/r/rust&lt;/a&gt;,
+&lt;a href=&quot;http://stackoverflow.com/questions/tagged/rust&quot;&gt;Stack Overflow&lt;/a&gt;, &lt;a href=&quot;https://twitter.com/hashtag/rustlang&quot;&gt;Twitter&lt;/a&gt;), and in my experience
+people in the community are extremely willing to give help and feedback. Whether
+that means answering questions, providing feedback, or trying to direct other
+people to contribute, the Rust community is quite good at getting people the
+answers and help they’re looking for. This is fantastic!&lt;/p&gt;
+
+&lt;p&gt;The Rust community also has a real care for designing high-quality APIs. This
+&lt;em&gt;does&lt;/em&gt; mean that some things may take longer than may be desirable to reach
+1.0, but it also means that if and when they do, you can be pretty well
+assured that the API design is good. Look at the impending &lt;a href=&quot;https://github.com/rust-lang/rfcs/pull/1620&quot;&gt;version 1.0 of the
+Rust regex crate&lt;/a&gt; for a nice example of this kind of care.&lt;/p&gt;
+
+&lt;p&gt;The Rust community is also &lt;em&gt;very&lt;/em&gt; out in the open. It may take some digging to
+find discussions sometimes, but that’s more about volume than anything else.
+Everything you need to follow what’s happening in Rust, including team
+meetings, can be &lt;a href=&quot;https://github.com/rust-lang/meeting-minutes&quot;&gt;found online&lt;/a&gt;. When things are
+insufficiently covered in issues or pull requests or RFCs, you can usually
+expect a blog post to cover the idea (and there’s work on &lt;a href=&quot;https://internals.rust-lang.org/t/should-there-be-a-rust-planet/3434&quot;&gt;making those blog
+posts easier to find&lt;/a&gt;, too).&lt;/p&gt;
+
+&lt;h2 id=&quot;what-we-get-wrong&quot;&gt;What We Get Wrong&lt;/h2&gt;
+
+&lt;p&gt;All of that being said, no community is perfect, and the Rust community is no
+exception. Before I get into the specifics, I want to say that I think these
+problems come from a good place, and that they can absolutely be improved.
+Part of why I’m writing this is to put a light on them a bit, and maybe get
+people thinking about how they talk when they talk about Rust.&lt;/p&gt;
+
+&lt;p&gt;The biggest problem is that we have a tendency to be too effusive when talking
+about Rust. In the eyes of many of us (myself certainly included), Rust is a
+&lt;em&gt;big deal&lt;/em&gt;. We want to spread the word! There are real problems in software
+development, particularly the development of efficient, scalable, large
+systems that Rust addresses, and we want to get people onto it as quickly as
+possible. That being said, there remain &lt;a href=&quot;https://www.reddit.com/r/rust/comments/4kqhqz/why_arent_you_using_rust_at_work/&quot;&gt;real reasons not to choose
+Rust&lt;/a&gt;, and it doesn’t solve everything. It’s worthwhile to remember
+that.&lt;/p&gt;
+
+&lt;p&gt;This means, first and most importantly, doing more to empathize with the
+specific situations of other developers and projects. To listen to what they’re
+dealing with, and to give an honest assessment of whether Rust would make sense
+for their situation, even if it means telling them that Rust isn’t the right
+choice.&lt;/p&gt;
+
+&lt;p&gt;Maybe Rust doesn’t have the right libraries (Yet! I hope! Maybe it’s an
+opportunity to fill the gap). Maybe the complexity of dealing with Rust’s
+safety guarantees isn’t worthwhile for the domain (as lightweight as the
+complexity of Rust can feel once you know it, there is a ramp up time, and it
+will be a bit of a fight in some domains). All of this is fine. Rust doesn’t
+have to be and certainly can’t be everything to everyone.&lt;/p&gt;
+
+&lt;p&gt;The more insiduous cousin of this problem is worse: judging people for &lt;em&gt;not&lt;/em&gt;
+choosing Rust. This may mean comments on a new project asking why it’s not
+written in Rust. This may mean comments on an old project about why it hasn’t
+been rewritten in Rust. Consistently though, it means condescension and
+arrogance that is nothing but off-putting to people outside of the community
+(and speaking for myself, someone inside of it).&lt;/p&gt;
+
+&lt;p&gt;Other languages are not the enemy. There is no enemy. Rust isn’t trying to,
+will not, and cannot “kill C / C++ / Java / (language of choice).” And other
+people aren’t wrong or bad for choosing something that isn’t Rust, nor is
+there an imperative to use Rust for anything. The imperative is better
+software, more correctness, more confidence in what we build. If Rust is how
+you get that, good for you. If it’s not, well good for you too.&lt;/p&gt;
+
+&lt;p&gt;There’s a lot to learn from other languages, and a lot to be done to bring
+people from other languages into our community. None of that is served by
+attacking, belittling, demeaning, or condescending to other languages or
+the people in their communities. We don’t need to tear them down for Rust
+to succeed. In fact doing so only makes success harder.&lt;/p&gt;
+
+&lt;p&gt;With all of this said, I don’t think that people in the Rust communiy who do
+this are trying to do any of these things. It’s easy to root for your team,
+and easy to point out the flaws in systems that have been around a long time.
+I guarantee you though, Rust has problems we haven’t found yet, or haven’t
+happened yet. They’ll happen, they’ll be found. Nothing is perfect.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-we-get-wrong-about-rust&quot;&gt;What We Get Wrong (About Rust)&lt;/h2&gt;
+
+&lt;p&gt;This follows on from the previous points. If we’re going to talk about what
+Rust offers, we need to be careful to get those guarantee statements right.
+There are certain mistakes in explaining Rust that many people will get wrong,
+with sometimes serious changes in meaning, and it can be problematic.&lt;/p&gt;
+
+&lt;p&gt;The most obvious example, which anyone in the Rust community has almost
+certainly done themselves and/or seen someone else do, is claiming that Rust
+guarantees no race conditions. It does not. It guarantees no data races. I’ll
+let &lt;a href=&quot;http://blog.regehr.org/archives/490&quot;&gt;John Regehr explain the difference&lt;/a&gt; (he does it better than I
+could here).&lt;/p&gt;
+
+&lt;p&gt;This is one example, but it’s a prototype for the problem. There’s a lot we
+still don’t know about the exact guarantees that Rust provides, and parts of
+the language remain unspecified. The &lt;a href=&quot;http://plv.mpi-sws.org/rustbelt/&quot;&gt;Rust Belt&lt;/a&gt; project will soon
+be working on solidifying our understanding of Rust’s guarantees, and there
+are language standardization efforts to crystalize things like the &lt;a href=&quot;https://github.com/rust-lang/rfcs/issues/1447&quot;&gt;Rust
+memory model&lt;/a&gt;, which will have substantive effects on &lt;a href=&quot;http://smallcultfollowing.com/babysteps/blog/2016/05/27/the-tootsie-pop-model-for-unsafe-code/&quot;&gt;what we
+can claim about Rust&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;All of this is to say that erring on the side of caution when making statements
+about Rust does or doesn’t do is probably the right thing. It’s not hard to
+come back and clarify that Rust does more than you thought. It’s harder to
+come back and say it does less.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I started this post with the most important thing to remember, which is that we
+all like Rust, and all of us in the community want to see it continue to grow,
+gain adoption, and succeed. Because we honestly believe that it’s a quality
+language that solves real problems, and that having more Rust in the world is
+a good thing. But there are things to keep in mind.&lt;/p&gt;
+
+&lt;p&gt;Let’s prosletize Rust, yeah? It’s easy to do. There’s a lot to like. Rust
+is well-situated to fit into systems new and old. It has Cargo, a good FFI, an active
+community, financial backing, the list goes on. But let’s do it better. Let’s
+do it in a way that builds the community, and makes sure people feel welcome
+and excited, not defensive.&lt;/p&gt;
+
+&lt;p&gt;The next time you’re writing or talking about Rust, particularly with someone
+who’s new to it, just remember: empathy, restraint, and honesty. That’s how we
+get people to try it, to learn, and to hopefully come to like it. Let’s focus
+on what we’re already good at, being welcoming and helpful, without the judgment
+or conflict that only drives people away.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">I love the Rust community, I really do. Like I said in my recent post about how to take part in it, I think the Rust community is one of the most consistently welcoming and friendly programming communities with which I’ve interacted. That being said, I think there are some problems with the way the Rust community presents itself and Rust to the outside world. In this post, I’d like to outline those problems, and some ideas for how the Rust community can be even better at explaining and pitching Rust to people who may not be sold on the idea yet.</summary></entry><entry><title type="html">Rust Modules and File Hierarchy</title><link href="https://possiblerust.com/pattern/rust-modules-and-file-hierarchy" rel="alternate" type="text/html" title="Rust Modules and File Hierarchy" /><published>2016-05-26T18:10:10-07:00</published><updated>2016-05-26T18:10:10-07:00</updated><id>https://possiblerust.com/pattern/rust-modules-and-file-hierarchy</id><content type="html" xml:base="https://possiblerust.com/pattern/rust-modules-and-file-hierarchy">&lt;p&gt;Rust’s module system follows some fairly simple rules, but also seems to be a
+tripping point for new users of the language. In this post, I am going to walk
+through how the Rust module system works, and how it maps to the organization
+of files on the file system.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;p&gt;Rust modules are how code is organized within a single crate (the term for
+Rust packages). Every crate starts with a top-level module, traditionally
+found in &lt;code class=&quot;highlighter-rouge&quot;&gt;src/lib.rs&lt;/code&gt; for libraries, and &lt;code class=&quot;highlighter-rouge&quot;&gt;src/main.rs&lt;/code&gt; for binaries.
+Additional modules are declared with the &lt;code class=&quot;highlighter-rouge&quot;&gt;mod&lt;/code&gt; keyword, while functions,
+types, etc. are used from a module with the &lt;code class=&quot;highlighter-rouge&quot;&gt;use&lt;/code&gt; keyword.&lt;/p&gt;
+
+&lt;h2 id=&quot;declaring-modules&quot;&gt;Declaring Modules&lt;/h2&gt;
+
+&lt;p&gt;Imagine the following Rust project structure (which is fairly standard):&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lib&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.rs&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.rs&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.rs&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Cargo&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.toml&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In &lt;code class=&quot;highlighter-rouge&quot;&gt;src/lib.rs&lt;/code&gt;, you would expect to find the following lines:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;These lines tell the Rust compiler to look in the current directory for two
+files called &lt;code class=&quot;highlighter-rouge&quot;&gt;foo&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;bar&lt;/code&gt;, or for folders &lt;code class=&quot;highlighter-rouge&quot;&gt;foo&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;bar&lt;/code&gt; with a file
+called &lt;code class=&quot;highlighter-rouge&quot;&gt;mod.rs&lt;/code&gt; in them. If it finds them, all is well. If it doesn’t,
+you’ll get an error.&lt;/p&gt;
+
+&lt;p&gt;Further down in &lt;code class=&quot;highlighter-rouge&quot;&gt;src/lib.rs&lt;/code&gt;, you may want to use something provided by one
+of these modules. This can be done like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// The `Foo` struct is in the `foo` module,&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// and being referenced through the module name.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;Foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Alternatively, if you don’t want to prefix &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo&lt;/code&gt; with the module name, you can
+&lt;code class=&quot;highlighter-rouge&quot;&gt;use&lt;/code&gt; it:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// `Foo` has been imported into the current&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// namespace, and doesn't need the module&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// name prefix any more.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;nesting-modules&quot;&gt;Nesting Modules&lt;/h2&gt;
+
+&lt;p&gt;If you want to nest your modules, you can do so like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- src/
+  |- lib.rs
+  |- foo.rs
+  |- bar/
+     |- mod.rs
+     |- baz.rs
+- Cargo.toml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In &lt;code class=&quot;highlighter-rouge&quot;&gt;src/lib.rs&lt;/code&gt;, your module declarations remain the same:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In &lt;code class=&quot;highlighter-rouge&quot;&gt;src/bar/mod.rs&lt;/code&gt;, you can then declare the modules in the current folder:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;public-modules&quot;&gt;Public Modules&lt;/h2&gt;
+
+&lt;p&gt;By default, declaration of a module is private. Meaning that users of the
+crate won’t be able to see the module and its contents. You can make a module
+public by prefixing the module’s declaration with &lt;code class=&quot;highlighter-rouge&quot;&gt;pub&lt;/code&gt;. If we wanted the
+&lt;code class=&quot;highlighter-rouge&quot;&gt;foo&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;bar&lt;/code&gt; modules to be public, we would change the imports in
+&lt;code class=&quot;highlighter-rouge&quot;&gt;src/lib.rs&lt;/code&gt; to:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now a user of the crate could access the internals of the &lt;code class=&quot;highlighter-rouge&quot;&gt;foo&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;bar&lt;/code&gt;
+modules like so (imaging the crate name is &lt;code class=&quot;highlighter-rouge&quot;&gt;blah&lt;/code&gt;):&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;extern&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// It's the same as before!&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;lt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;Foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You may have noticed the &lt;code class=&quot;highlighter-rouge&quot;&gt;extern crate&lt;/code&gt; declaration. This tells the Rust
+compiler to learn for a crate to link to, called “blah”. If you’re using
+Cargo (which you probably should be!) then Cargo will automatically link
+in whatever crates are listed in the &lt;code class=&quot;highlighter-rouge&quot;&gt;[dependencies]&lt;/code&gt; section of your
+&lt;code class=&quot;highlighter-rouge&quot;&gt;Cargo.toml&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;h2 id=&quot;re-exporting&quot;&gt;Re-exporting&lt;/h2&gt;
+
+&lt;p&gt;When organizing your modules, you also have the option to re-export things
+from another module, so that they are also available from the current one.&lt;/p&gt;
+
+&lt;p&gt;For example, if &lt;code class=&quot;highlighter-rouge&quot;&gt;src/bar/baz.rs&lt;/code&gt; defined a &lt;code class=&quot;highlighter-rouge&quot;&gt;Baz&lt;/code&gt; struct that you wanted to
+be available from the top-level crate module, you could do it like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;// In src/lib.rs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;// In src/bar/mod.rs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;mod&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;// In src/bar/baz.rs&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// ...&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, a user of your crate could access &lt;code class=&quot;highlighter-rouge&quot;&gt;Baz&lt;/code&gt; like so:&lt;/p&gt;
+
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;extern&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// Pulled into the current module's namespace,&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// you can access `Baz` directly.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;// This is also an option.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;// As is this!&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;blah&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;Baz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Rust keeps a clean separation between declaring a module and &lt;code class=&quot;highlighter-rouge&quot;&gt;use&lt;/code&gt;ing its
+contents, and also keeps a tight integration between the organization of
+modules in a project and their association with files and folders in your
+project’s source tree. There are other things not covered here (like the
+&lt;code class=&quot;highlighter-rouge&quot;&gt;self&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;super&lt;/code&gt; keywords, multi-part &lt;code class=&quot;highlighter-rouge&quot;&gt;use&lt;/code&gt; declarations, and inline
+modules) which are better covered &lt;a href=&quot;https://doc.rust-lang.org/book/crates-and-modules.html&quot;&gt;in the Rust book&lt;/a&gt;.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Modules" /><summary type="html">Rust’s module system follows some fairly simple rules, but also seems to be a tripping point for new users of the language. In this post, I am going to walk through how the Rust module system works, and how it maps to the organization of files on the file system.</summary></entry><entry><title type="html">Joining the Rust Community</title><link href="https://possiblerust.com/community/joining-the-rust-community" rel="alternate" type="text/html" title="Joining the Rust Community" /><published>2016-05-25T15:38:24-07:00</published><updated>2016-05-25T15:38:24-07:00</updated><id>https://possiblerust.com/community/joining-the-rust-community</id><content type="html" xml:base="https://possiblerust.com/community/joining-the-rust-community">&lt;p&gt;If you’re new to the Rust community, and unsure of what to read, how to take part,
+or where to ask questions, this post is for you. The Rust community is growing and
+active, and it can be difficult to understand what all the parts of it are, and how
+to go about orienting yourself in the Rust world. Hopefully, by the end of this
+post you will have a better sense of things.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;what-to-read&quot;&gt;What To Read&lt;/h2&gt;
+
+&lt;p&gt;The first thing to read about Rust is the &lt;a href=&quot;https://doc.rust-lang.org/book/&quot;&gt;“The Rust Programming Language,”&lt;/a&gt;
+which is the official Rust book, maintained by the Rust team. It’s updated
+regularly, and is the go-to introduction to the language.&lt;/p&gt;
+
+&lt;p&gt;Next, check out the &lt;a href=&quot;https://www.rust-lang.org/faq.html&quot;&gt;Frequently Asked Questions&lt;/a&gt; page, and remember it for later.
+There are a variety of questions you’ll probably have that are already answered here.&lt;/p&gt;
+
+&lt;p&gt;If you’re looking to get into the unsafe portions of Rust, read the
+&lt;a href=&quot;https://doc.rust-lang.org/nomicon/&quot;&gt;Rustonomicon&lt;/a&gt;. It provides a much higher degree of detail about the
+specifics of a variety of Rust features, and along with the Rust Book provides the
+most complete and official treatment of the language as a whole.&lt;/p&gt;
+
+&lt;p&gt;If you want a variety of resources developed by people from around the Rust
+community, the &lt;a href=&quot;https://github.com/ctjhoa/rust-learning&quot;&gt;rust-learning&lt;/a&gt; repo is regularly adding new content
+to help you understand Rust.&lt;/p&gt;
+
+&lt;p&gt;When you need to know what’s provided in the Rust standard library, &lt;a href=&quot;https://doc.rust-lang.org/std/&quot;&gt;read the API
+docs.&lt;/a&gt; If you’re using DuckDuckGo, you can quickly search the Rust API docs
+by adding &lt;code class=&quot;highlighter-rouge&quot;&gt;!rust&lt;/code&gt; to the beginning of your searches.&lt;/p&gt;
+
+&lt;p&gt;To understand Cargo, the Rust package manager, check out the official
+&lt;a href=&quot;http://doc.crates.io/guide.html&quot;&gt;Cargo Guide&lt;/a&gt;, which includes a lot of detail about what Cargo does,
+and how it works.&lt;/p&gt;
+
+&lt;p&gt;There’s also the &lt;a href=&quot;https://doc.rust-lang.org/error-index.html&quot;&gt;Compiler Error Index&lt;/a&gt;, which you can also read using
+&lt;code class=&quot;highlighter-rouge&quot;&gt;rustc --explain &amp;lt;error number&amp;gt;&lt;/code&gt;, and the &lt;a href=&quot;https://doc.rust-lang.org/book/syntax-index.html&quot;&gt;syntax index&lt;/a&gt;, which
+lists and describes all of Rust’s syntactic features.&lt;/p&gt;
+
+&lt;p&gt;If you want to stay up to date with what’s happening in the world of Rust, check out
+&lt;a href=&quot;https://this-week-in-rust.org/&quot;&gt;This Week in Rust&lt;/a&gt;, which links to blog posts and projects from the community,
+highlights quality Rust crates, and lists upcoming Rust events around the world.&lt;/p&gt;
+
+&lt;p&gt;Finally, check out Rust’s policies on &lt;a href=&quot;https://www.rust-lang.org/security.html&quot;&gt;security&lt;/a&gt;,
+&lt;a href=&quot;https://www.rust-lang.org/legal.html&quot;&gt;copyrights&lt;/a&gt;, and the &lt;a href=&quot;https://www.rust-lang.org/conduct.html&quot;&gt;code of conduct&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-to-take-part&quot;&gt;How To Take Part&lt;/h2&gt;
+
+&lt;p&gt;You can contribute to Rust in a number of ways:&lt;/p&gt;
+
+&lt;p&gt;Tackle an issue in the Rust compiler issue tracker, maybe one marked
+&lt;a href=&quot;https://github.com/rust-lang/rust/issues?utf8=%E2%9C%93&amp;amp;q=is%3Aopen+is%3Aissue+label%3AE-easy&quot;&gt;easy&lt;/a&gt; or one with &lt;a href=&quot;https://github.com/rust-lang/rust/issues?utf8=%E2%9C%93&amp;amp;q=is%3Aopen+is%3Aissue+label%3AE-mentor+&quot;&gt;mentoring&lt;/a&gt; available.&lt;/p&gt;
+
+&lt;p&gt;Contribute to one of the other Rust project repositories, like the
+&lt;a href=&quot;https://github.com/rust-lang/rust-www&quot;&gt;Rust website&lt;/a&gt;, the &lt;a href=&quot;https://github.com/rust-lang/cargo&quot;&gt;Cargo repo&lt;/a&gt;, or one of the repos in the
+&lt;a href=&quot;https://github.com/rust-lang-nursery&quot;&gt;nursery&lt;/a&gt; (these are repositories being considered for “official” status
+as part of the Rust project).&lt;/p&gt;
+
+&lt;p&gt;You can also read and give input on &lt;a href=&quot;https://github.com/rust-lang/rfcs/&quot;&gt;Rust RFCs&lt;/a&gt; (Requests for Comments),
+which are proposals for improvements to the Rust language.&lt;/p&gt;
+
+&lt;p&gt;This Week in Rust includes a section listing
+&lt;a href=&quot;https://this-week-in-rust.org/blog/2016/05/23/this-week-in-rust-131/#call-for-participation&quot;&gt;opportunities for participation&lt;/a&gt; on a variety of Rust
+projects around the community. This is the link to the most recent This Week in Rust
+post (at the time of this article’s publication), but each week should have a similar
+section.&lt;/p&gt;
+
+&lt;p&gt;If you don’t necessarily want to write code, writing documentation is always
+appreciated. There are a number of &lt;a href=&quot;https://github.com/rust-lang/rust/issues?q=is%3Aopen+is%3Aissue+label%3AA-docs&quot;&gt;open issues&lt;/a&gt; for improving the
+official Rust documentation, and there are always &lt;a href=&quot;https://crates.io/crates&quot;&gt;Rust crates&lt;/a&gt; in need of
+better documentation as well.&lt;/p&gt;
+
+&lt;p&gt;You can also do what I’m doing here, and write blog posts. Whether you’re new to
+Rust or an old hand at it, explaining what you’re doing, how you’re doing it, and
+the problems you have and things you learn is all valuable to other programmers
+both inside and outside of the community!&lt;/p&gt;
+
+&lt;h2 id=&quot;where-to-ask-questions&quot;&gt;Where to Ask Questions&lt;/h2&gt;
+
+&lt;p&gt;Finally, where do you go to ask questions? There are a number of options in the Rust
+community, including:&lt;/p&gt;
+
+&lt;p&gt;The official Rust &lt;a href=&quot;https://users.rust-lang.org/&quot;&gt;users forum&lt;/a&gt;, which is a central location to ask
+about and discuss Rust. If you’re looking to have a technical discussion about the
+internals of the Rust compiler, or ideas for the Rust project, you can alternatively
+use the Rust &lt;a href=&quot;https://internals.rust-lang.org/&quot;&gt;internals forum&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;If you prefer immediate chat, there’s always IRC. Rust’s IRC channels are all on the
+Mozilla IRC network (&lt;code class=&quot;highlighter-rouge&quot;&gt;irc.mozilla.org&lt;/code&gt;). The Rust website includes an up-to-date
+&lt;a href=&quot;https://www.rust-lang.org/community.html#irc-channels&quot;&gt;list of major Rust IRC channels&lt;/a&gt;, and a number of projects also
+maintain their own project-specific channels as well.&lt;/p&gt;
+
+&lt;p&gt;If you want to meet in person, there are
+&lt;a href=&quot;https://www.rust-lang.org/user-groups.html&quot;&gt;over 50 Rust user groups worldwide&lt;/a&gt;, as well as the
+&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=apd9vmbc22egenmtu5l6c5jbfc@group.calendar.google.com&amp;amp;pli=1&quot;&gt;Rust calendar&lt;/a&gt;, which includes a variety of regular events and
+conferences.&lt;/p&gt;
+
+&lt;p&gt;If you like Reddit, the &lt;a href=&quot;https://www.reddit.com/r/rust&quot;&gt;Rust subreddit&lt;/a&gt; is active, and a useful place
+to ask and answer questions, and to keep up with the goings-on of the Rust community.&lt;/p&gt;
+
+&lt;p&gt;There’s also always &lt;a href=&quot;http://stackoverflow.com/questions/tagged/rust&quot;&gt;Stack Overflow&lt;/a&gt;, which has the Rust tag to
+keep track of Rust-related questions.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;This is by no means a complete map to the world of Rust, but it hopefully helps
+point you in the direction of what you need. In the end, the best way to become
+comfortable in the Rust community is to take part in it! Ask questions! Contribute
+where you can!&lt;/p&gt;
+
+&lt;p&gt;The Rust community places a high premium on friendliness, and I hope your first
+interactions with the community reflect that. I certainly feel that the Rust
+community is one of the best programming communities in which I’ve taken part, and I
+hope that you enjoy it, however you get involved, and whatever your skill level is.&lt;/p&gt;
+
+&lt;p&gt;Have fun, and welcome to the Rust community!&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">If you’re new to the Rust community, and unsure of what to read, how to take part, or where to ask questions, this post is for you. The Rust community is growing and active, and it can be difficult to understand what all the parts of it are, and how to go about orienting yourself in the Rust world. Hopefully, by the end of this post you will have a better sense of things.</summary></entry><entry><title type="html">A Proper Domain Name</title><link href="https://possiblerust.com/meta/a-proper-domain-name" rel="alternate" type="text/html" title="A Proper Domain Name" /><published>2016-03-31T23:09:28-07:00</published><updated>2016-03-31T23:09:28-07:00</updated><id>https://possiblerust.com/meta/a-proper-domain-name</id><content type="html" xml:base="https://possiblerust.com/meta/a-proper-domain-name">&lt;p&gt;As of the writing of this post, this site is now on a proper domain name:
+&lt;a href=&quot;http://www.suspectsemantics.com&quot;&gt;suspectsemantics.com&lt;/a&gt;. I’ve had this domain
+name for a good long while (years at this point), and I’m glad I’ve found a good
+use for it. The transition to the new name went smoothly, and links to the
+old GitHub Pages URL all appear to be redirecting correctly. If you have any
+issues with the new site, let me know on the site’s
+&lt;a href=&quot;https://github.com/andrewbrinker/andrewbrinker.github.io&quot;&gt;GitHub Repo&lt;/a&gt;.&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><summary type="html">As of the writing of this post, this site is now on a proper domain name: suspectsemantics.com. I’ve had this domain name for a good long while (years at this point), and I’m glad I’ve found a good use for it. The transition to the new name went smoothly, and links to the old GitHub Pages URL all appear to be redirecting correctly. If you have any issues with the new site, let me know on the site’s GitHub Repo.</summary></entry></feed>
