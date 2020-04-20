@@ -136,10 +136,6 @@ blockquote > * + * { margin-top: 1.5rem; }
 
 .button span, .button:visited span { display: block; font-size: 0.667rem; line-height: 1.5em; font-weight: 500; }
 
-.mobile-only { display: block; }
-
-@media screen and (min-width: 60rem) { .mobile-only { display: none; } }
-
 .site { padding: 3rem 1.5rem; }
 
 @media screen and (max-width: 60rem) { .site .site-body { display: flex; flex-direction: column; }
@@ -526,5 +522,9 @@ blockquote > * + * { margin-top: 1.5rem; }
 
 @media screen and (min-width: 60rem) { .other-posts { display: flex; justify-content: space-between; align-items: stretch; }
   .other-posts a { display: inline-block; width: 33.333%; margin-bottom: 0; } }
+
+.mobile-only { display: block; }
+
+@media screen and (min-width: 60rem) { .mobile-only { display: none; } }
 
 /*# sourceMappingURL=main.css.map */
