@@ -1,1 +1,201 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-05-24T18:37:29-07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Possible Rust</title><subtitle>A blog about what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author></feed>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-06-21T15:59:51-07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Possible Rust</title><subtitle>A blog about what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Rust Lints You May Not Know</title><link href="http://localhost:4000/patterns/rust-lints-you-may-not-know" rel="alternate" type="text/html" title="Rust Lints You May Not Know" /><published>2020-06-21T15:59:00-07:00</published><updated>2020-06-21T15:59:00-07:00</updated><id>http://localhost:4000/patterns/rust-lints-you-may-not-know</id><content type="html" xml:base="http://localhost:4000/patterns/rust-lints-you-may-not-know">&lt;p&gt;The Rust compiler ships with a number of useful lints on by default,
+and many use Clippy to provide additional lints. It’s less well known
+that the Rust compiler ships with some useful lints which are set to
+&lt;code class=&quot;highlighter-rouge&quot;&gt;allow&lt;/code&gt; by default, meaning they don’t generate warnings. In this post,
+I’ll explain what each of these lints does, and why it might be useful.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;where-to-find-these-lints&quot;&gt;Where to Find These Lints&lt;/h2&gt;
+
+&lt;p&gt;The lists of “allowed-by-default” lints can be found in the &lt;a href=&quot;https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html&quot; title=&quot;List of allowed-by-default lints&quot;&gt;“Rustc book,”&lt;/a&gt;
+a guide to the Rust compiler produced by the Rust team. This page does a good
+job of explaining what the lints are, how to turn them on, and what effect they have
+on your code. What it doesn’t do is explain why these lints are present, or why they
+are turned off by default.&lt;/p&gt;
+
+&lt;p&gt;For code examples for each of these lints, refer to the Rustc Book.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-lints&quot;&gt;The Lints&lt;/h2&gt;
+
+&lt;h3 id=&quot;anonymous-parameters&quot;&gt;Anonymous Parameters&lt;/h3&gt;
+
+&lt;p&gt;Rust has historically allowed parameter names to be omitted in trait definitions,
+in a manner similar to the ability in C or C++ to omit parameter names for function
+prototypes in header files. However, in current Rust that is increasingly considered
+poor style, and support for it is being phased out.&lt;/p&gt;
+
+&lt;p&gt;Resolving this lint is easy. If you don’t want to have to name the parameters, you can
+use the name &lt;code class=&quot;highlighter-rouge&quot;&gt;_&lt;/code&gt;, which is Rust’s standard name for ignoring values. However, the
+purpose of this lint is to encourage you to provide useful, meaningful names for the
+parameters.&lt;/p&gt;
+
+&lt;h3 id=&quot;bare-trait-objects&quot;&gt;Bare Trait Objects&lt;/h3&gt;
+
+&lt;p&gt;In Rust 2018, the syntax for trait objects was changed to make it clearer when a trait
+object is being used. This choice was made to be more in line with Rust’s notion that
+performance differences should be syntactically obvious. Trait objects are fat pointers
+which must do dynamic dispatch to resolve function calls to concrete functions, and as
+such it’s worthwhile to make clear when that cost is being paid.&lt;/p&gt;
+
+&lt;p&gt;This lint is triggered when trait objects are used with the old syntax, and is resolved
+by adding the &lt;code class=&quot;highlighter-rouge&quot;&gt;dyn&lt;/code&gt; keyword before the name of the trait. So &lt;code class=&quot;highlighter-rouge&quot;&gt;Box&amp;lt;MyTrait&amp;gt;&lt;/code&gt; becomes
+&lt;code class=&quot;highlighter-rouge&quot;&gt;Box&amp;lt;dyn MyTrait&amp;gt;&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;MyTrait&lt;/code&gt; becomes &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;dyn MyTrait&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;box-pointers&quot;&gt;Box Pointers&lt;/h3&gt;
+
+&lt;p&gt;Before Rust offered a mechanism to change the default allocator, one had to implement
+their own version of &lt;code class=&quot;highlighter-rouge&quot;&gt;Box&lt;/code&gt; which used a different underying allocator. In that situation,
+it was desirable for the compiler to flag if you still used the standard &lt;code class=&quot;highlighter-rouge&quot;&gt;Box&lt;/code&gt; type, as
+that would &lt;em&gt;not&lt;/em&gt; use the custom allocator you intended.&lt;/p&gt;
+
+&lt;p&gt;Today, Rust programs can freely change the default allocator, removing the common need
+for this lint. Otherwise, it’s useful if you wish to disallow heap allocation, although
+there remain other types (like &lt;code class=&quot;highlighter-rouge&quot;&gt;Vec&lt;/code&gt;) which allocate data on the heap, so this lint would
+be useful, but not sufficient, for ensuring no heap allocations occur.&lt;/p&gt;
+
+&lt;h3 id=&quot;elided-lifetime-in-path&quot;&gt;Elided Lifetime in Path&lt;/h3&gt;
+
+&lt;p&gt;It is often desirable to omit specification of lifetimes in places where there do not
+exist meaningful constraints against them. To support this, and make writing Rust
+programs simpler, Rust permits elision of lifetimes, and will apply a set of rules for
+filling in lifetime information.&lt;/p&gt;
+
+&lt;p&gt;However, the elision of lifetimes comes with a tradeoff, as it may no longer be clear
+when a data type contains references. Given that references must obey a restriction of
+aliasing XOR mutability, not knowing a type contains references may lead one to writing
+code which violates those restrictions unintentionally, and is therefore rejected by
+the compiler.&lt;/p&gt;
+
+&lt;p&gt;This lint disallows lifetime elision in paths, requiring consistent clarity on the
+presence of borrowed data. It trades off clarity of syntax for clarity of semantics, and
+its application is a matter of taste.&lt;/p&gt;
+
+&lt;h3 id=&quot;missing-copy-implementations&quot;&gt;Missing Copy Implementations&lt;/h3&gt;
+
+&lt;p&gt;In general, it is considered good Rust practice to implement common traits like &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt;
+for types which are able to implement them. This recommendation is enshrined in the
+Rust API guidelines, and is intended to make types provided by Rust crates usable
+in as wide a variety of contexts as possible.&lt;/p&gt;
+
+&lt;p&gt;This lint helps make sure you don’t forget to implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt;, one of the simpler
+and more useful common traits, when possible.&lt;/p&gt;
+
+&lt;p&gt;However, there are a couple important notes to make. First, there are types which
+one may &lt;em&gt;not&lt;/em&gt; want to implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt; for. For example, a type which is designed
+to generate monotonically increasing ID numbers probably should not be copied,
+lest you end up with two generators generating duplicate IDs. Second, there is a
+cost in compile times for generating trait implementations, and so removing
+excess trait impls may be desirable for reducing the compilation time of a crate.&lt;/p&gt;
+
+&lt;p&gt;In cases where a particular type ought not to be copied, or where the cost of deriving
+excess traits is too high, you may assign an item attribute which selectively sets this
+lint to &lt;code class=&quot;highlighter-rouge&quot;&gt;allow&lt;/code&gt;. Ideally, this would be accompanied by a comment explaining the
+reasoning behind the exception.&lt;/p&gt;
+
+&lt;h3 id=&quot;missing-debug-implementations&quot;&gt;Missing Debug Implementations&lt;/h3&gt;
+
+&lt;p&gt;The same that could be said for the last lint may be said about this one. &lt;code class=&quot;highlighter-rouge&quot;&gt;Debug&lt;/code&gt;
+is a common and useful trait that may, as the name suggests, be used to debug
+Rust programs by viewing the internals of the types for which it is implemented.&lt;/p&gt;
+
+&lt;p&gt;However, there are some types which ought &lt;em&gt;not&lt;/em&gt; to implement &lt;code class=&quot;highlighter-rouge&quot;&gt;Debug&lt;/code&gt;, the most
+notable of which are any types which contain secret data. If a type representing
+a cryptographic key implements &lt;code class=&quot;highlighter-rouge&quot;&gt;Debug&lt;/code&gt;, it may end up accidentally being printed
+to a log or some other location, where an attacker may be able to read it.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Debug&lt;/code&gt;, same as &lt;code class=&quot;highlighter-rouge&quot;&gt;Copy&lt;/code&gt;, also comes with a compilation-time cost which may not
+be desirable. This tradeoff ought to be assessed contextually.&lt;/p&gt;
+
+&lt;h3 id=&quot;missing-docs&quot;&gt;Missing Docs&lt;/h3&gt;
+
+&lt;p&gt;Rust makes it easy to create API documentation using the &lt;code class=&quot;highlighter-rouge&quot;&gt;rustdoc&lt;/code&gt; tool, and
+ideally all publicly-exposed parts of a crate’s API will receive some degree of
+documentation. This lint helps ensure that, although it says nothing about the
+&lt;em&gt;quality&lt;/em&gt; of the documentation provided.&lt;/p&gt;
+
+&lt;p&gt;Consider this lint an often necessary but never sufficient part of writing
+high-quality documentation for Rust crates.&lt;/p&gt;
+
+&lt;h3 id=&quot;single-use-lifetimes&quot;&gt;Single Use Lifetimes&lt;/h3&gt;
+
+&lt;p&gt;If a lifetime appears in only one places, there’s a question of why it’s there
+at all. The goal of well-written lifetime constraints in functions or struct
+definitions is to make clear what the constraints are, by eliminating
+lifetimes which do not need to be explicitly named. This lint is designed to
+catch this case, making it easier to write expressive lifetimes.&lt;/p&gt;
+
+&lt;h3 id=&quot;trivial-casts&quot;&gt;Trivial Casts&lt;/h3&gt;
+
+&lt;p&gt;Some casts aren’t necessary, and could instead be replaced with type coercion,
+possibly or optionally with type ascription to specify the new coerced type,
+which is considered better style. This lint catches such unecessary casts.&lt;/p&gt;
+
+&lt;h3 id=&quot;trivial-numeric-casts&quot;&gt;Trivial Numeric Casts&lt;/h3&gt;
+
+&lt;p&gt;Similarly, some casts between numeric types aren’t necessary, and will be
+flagged by this lint.&lt;/p&gt;
+
+&lt;h3 id=&quot;unreachable-pub&quot;&gt;Unreachable Pub&lt;/h3&gt;
+
+&lt;p&gt;The use of &lt;code class=&quot;highlighter-rouge&quot;&gt;pub&lt;/code&gt; in Rust is to declare an item as public, but if the item’s
+containing module is private, the item will itself be private, regardless
+of the visibility specified on it directly. This lint helps to catch these
+cases, which left unchecked may lead to confusion about visibility when
+reading a program’s source code.&lt;/p&gt;
+
+&lt;h3 id=&quot;unsafe-code&quot;&gt;Unsafe Code&lt;/h3&gt;
+
+&lt;p&gt;Unsafe code is an important part of Rust, but it’s not always desirable
+to write yourself. Writing correct unsafe code requires care and attentiveness,
+and may not be worth the effort for individual projects. To ensure no
+unsafe code is currently present, and limit its introduction in the future,
+use this lint.&lt;/p&gt;
+
+&lt;h3 id=&quot;unused-extern-crates&quot;&gt;Unused Extern Crates&lt;/h3&gt;
+
+&lt;p&gt;Rust 2018 substantially reduced the need to specify external crates explicitly
+in source code, but there remain reasons to do so. If an extern crate is unused,
+this lint will catch and report it.&lt;/p&gt;
+
+&lt;h3 id=&quot;unused-import-braces&quot;&gt;Unused Import Braces&lt;/h3&gt;
+
+&lt;p&gt;This is a simple syntactic lint to eliminate braces in imports when used around
+a single name, as they aren’t necessary.&lt;/p&gt;
+
+&lt;h3 id=&quot;unused-qualifications&quot;&gt;Unused Qualifications&lt;/h3&gt;
+
+&lt;p&gt;This lint catches when a name is referenced with unnecessary qualification. If a
+path has already been imported, then it’s no longer necessary to use the entire
+path to items in that name.&lt;/p&gt;
+
+&lt;h3 id=&quot;unused-results&quot;&gt;Unused Results&lt;/h3&gt;
+
+&lt;p&gt;Results are Rust’s core mechanism for reporting and handling errors, and as such
+it is strongly recommended to check the values of results when they’re returned.&lt;/p&gt;
+
+&lt;p&gt;If a situation exists where you feel confident that a result does not need to be
+checked, you can selectively turn off the lint, ideally with a comment explaining
+why you believe it’s acceptable not to check the results contained in the function.&lt;/p&gt;
+
+&lt;h3 id=&quot;variant-size-differences&quot;&gt;Variant Size Differences&lt;/h3&gt;
+
+&lt;p&gt;Enums are as large as their largest variant, so if an enum has one variant which is
+substantially larger than the rest, then all uses of the enum will end up with
+substantial amounts of wasted space. This lint catches this case, and offers
+recommendations to reduce the size of the large variant.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Not all of these will make sense for your code at all, or may not make sense for
+the moment. Rejecting missing documentation isn’t worthwhile when you’re just
+starting out and aren’t prepared to write documentation for code which is highly
+subject to change. Some of these are no longer as useful with modern Rust,
+or are only useful in limited contexts.&lt;/p&gt;
+
+&lt;p&gt;That said, lints like the unused copy or debug implementation lints are generally
+useful, even if you selectively ignore them in specific cases. As a default,
+deriving these traits for libraries is good. In binaries, you may not care as
+much.&lt;/p&gt;
+
+&lt;p&gt;Whether you use them or not, it’s useful to be aware that these lints exist!&lt;/p&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Lints" /><summary type="html">The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.</summary></entry></feed>

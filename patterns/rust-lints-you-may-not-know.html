@@ -4,7 +4,7 @@
         <meta charset="utf-8">
 
         
-            <title>About - Possible Rust</title>
+            <title>Rust Lints You May Not Know - Possible Rust</title>
         
 
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -24,19 +24,21 @@
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="About" />
+<meta property="og:title" content="Rust Lints You May Not Know" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="A blog about what’s possible in Rust." />
-<meta property="og:description" content="A blog about what’s possible in Rust." />
-<link rel="canonical" href="http://localhost:4000/about/" />
-<meta property="og:url" content="http://localhost:4000/about/" />
+<meta name="description" content="The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful." />
+<meta property="og:description" content="The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful." />
+<link rel="canonical" href="http://localhost:4000/patterns/rust-lints-you-may-not-know" />
+<meta property="og:url" content="http://localhost:4000/patterns/rust-lints-you-may-not-know" />
 <meta property="og:site_name" content="Possible Rust" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-21T15:59:00-07:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="About" />
+<meta property="twitter:title" content="Rust Lints You May Not Know" />
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"About","url":"http://localhost:4000/about/","description":"A blog about what’s possible in Rust.","sameAs":["https://twitter.com/PossibleRust"],"@type":"WebSite","name":"PossibleRust","@context":"https://schema.org"}</script>
+{"headline":"Rust Lints You May Not Know","dateModified":"2020-06-21T15:59:00-07:00","url":"http://localhost:4000/patterns/rust-lints-you-may-not-know","description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","datePublished":"2020-06-21T15:59:00-07:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/patterns/rust-lints-you-may-not-know"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -61,11 +63,11 @@
 
 
 
-                <h2 class="site-title">About</h2>
+                <h2 class="site-title">Rust Lints You May Not Know</h2>
                 <p class="post-preview-meta">
-                    
-
-
+                    Jun 21st, 2020
+ &middot;  <a href="/patterns" class="meta">Patterns</a>  
+ &middot;  <a href="/tags#lints" class="meta">#lints</a>  
                 </p>
             
 
@@ -199,32 +201,246 @@ Feed</a>
 
 
                 <div class="site-content">
-                    <h3 id="about-the-site">About the Site</h3>
+                    <div class="post " role="main">
+    
+    
+    <div class="post-content" role="article">
+        <p>The Rust compiler ships with a number of useful lints on by default,
+and many use Clippy to provide additional lints. It’s less well known
+that the Rust compiler ships with some useful lints which are set to
+<code class="highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
+I’ll explain what each of these lints does, and why it might be useful.</p>
 
-<p>Possible Rust is a blog about the Rust programming language; what you can do with it, how to use it effectively, where the language is going, what’s in the ecosystem, and a million other things. More than any of that, it’s an opportunity to share what I have learned and am still learning about Rust!</p>
+<!-- more -->
 
-<p>If you’re learning Rust for the first time, or are interesting in learning Rust, or you’ve been using it for a while but are curious to know more, this blog is for you! If you have questions about the language, please feel free to ask them on Twitter <a href="https://twitter.com/possiblerust">@PossibleRust</a>, either publicly or via direct message (my DM’s are open).</p>
+<h2 id="where-to-find-these-lints">Where to Find These Lints</h2>
 
-<p>It’s also intended to be accessible. This is a best-effort commitment with the resources I have available. If you identify an accessibility problem please let me know so I can try to resolve it.</p>
+<p>The lists of “allowed-by-default” lints can be found in the <a href="https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html" title="List of allowed-by-default lints">“Rustc book,”</a>
+a guide to the Rust compiler produced by the Rust team. This page does a good
+job of explaining what the lints are, how to turn them on, and what effect they have
+on your code. What it doesn’t do is explain why these lints are present, or why they
+are turned off by default.</p>
 
-<h3 id="about-andrew">About Andrew</h3>
+<p>For code examples for each of these lints, refer to the Rustc Book.</p>
 
-<div class="image-right">
-    <img class="right" src="/assets/img/me.jpg" alt="A picture of Andrew Lilley Brinker" />
+<h2 id="the-lints">The Lints</h2>
+
+<h3 id="anonymous-parameters">Anonymous Parameters</h3>
+
+<p>Rust has historically allowed parameter names to be omitted in trait definitions,
+in a manner similar to the ability in C or C++ to omit parameter names for function
+prototypes in header files. However, in current Rust that is increasingly considered
+poor style, and support for it is being phased out.</p>
+
+<p>Resolving this lint is easy. If you don’t want to have to name the parameters, you can
+use the name <code class="highlighter-rouge">_</code>, which is Rust’s standard name for ignoring values. However, the
+purpose of this lint is to encourage you to provide useful, meaningful names for the
+parameters.</p>
+
+<h3 id="bare-trait-objects">Bare Trait Objects</h3>
+
+<p>In Rust 2018, the syntax for trait objects was changed to make it clearer when a trait
+object is being used. This choice was made to be more in line with Rust’s notion that
+performance differences should be syntactically obvious. Trait objects are fat pointers
+which must do dynamic dispatch to resolve function calls to concrete functions, and as
+such it’s worthwhile to make clear when that cost is being paid.</p>
+
+<p>This lint is triggered when trait objects are used with the old syntax, and is resolved
+by adding the <code class="highlighter-rouge">dyn</code> keyword before the name of the trait. So <code class="highlighter-rouge">Box&lt;MyTrait&gt;</code> becomes
+<code class="highlighter-rouge">Box&lt;dyn MyTrait&gt;</code>, and <code class="highlighter-rouge">&amp;MyTrait</code> becomes <code class="highlighter-rouge">&amp;dyn MyTrait</code>.</p>
+
+<h3 id="box-pointers">Box Pointers</h3>
+
+<p>Before Rust offered a mechanism to change the default allocator, one had to implement
+their own version of <code class="highlighter-rouge">Box</code> which used a different underying allocator. In that situation,
+it was desirable for the compiler to flag if you still used the standard <code class="highlighter-rouge">Box</code> type, as
+that would <em>not</em> use the custom allocator you intended.</p>
+
+<p>Today, Rust programs can freely change the default allocator, removing the common need
+for this lint. Otherwise, it’s useful if you wish to disallow heap allocation, although
+there remain other types (like <code class="highlighter-rouge">Vec</code>) which allocate data on the heap, so this lint would
+be useful, but not sufficient, for ensuring no heap allocations occur.</p>
+
+<h3 id="elided-lifetime-in-path">Elided Lifetime in Path</h3>
+
+<p>It is often desirable to omit specification of lifetimes in places where there do not
+exist meaningful constraints against them. To support this, and make writing Rust
+programs simpler, Rust permits elision of lifetimes, and will apply a set of rules for
+filling in lifetime information.</p>
+
+<p>However, the elision of lifetimes comes with a tradeoff, as it may no longer be clear
+when a data type contains references. Given that references must obey a restriction of
+aliasing XOR mutability, not knowing a type contains references may lead one to writing
+code which violates those restrictions unintentionally, and is therefore rejected by
+the compiler.</p>
+
+<p>This lint disallows lifetime elision in paths, requiring consistent clarity on the
+presence of borrowed data. It trades off clarity of syntax for clarity of semantics, and
+its application is a matter of taste.</p>
+
+<h3 id="missing-copy-implementations">Missing Copy Implementations</h3>
+
+<p>In general, it is considered good Rust practice to implement common traits like <code class="highlighter-rouge">Copy</code>
+for types which are able to implement them. This recommendation is enshrined in the
+Rust API guidelines, and is intended to make types provided by Rust crates usable
+in as wide a variety of contexts as possible.</p>
+
+<p>This lint helps make sure you don’t forget to implement <code class="highlighter-rouge">Copy</code>, one of the simpler
+and more useful common traits, when possible.</p>
+
+<p>However, there are a couple important notes to make. First, there are types which
+one may <em>not</em> want to implement <code class="highlighter-rouge">Copy</code> for. For example, a type which is designed
+to generate monotonically increasing ID numbers probably should not be copied,
+lest you end up with two generators generating duplicate IDs. Second, there is a
+cost in compile times for generating trait implementations, and so removing
+excess trait impls may be desirable for reducing the compilation time of a crate.</p>
+
+<p>In cases where a particular type ought not to be copied, or where the cost of deriving
+excess traits is too high, you may assign an item attribute which selectively sets this
+lint to <code class="highlighter-rouge">allow</code>. Ideally, this would be accompanied by a comment explaining the
+reasoning behind the exception.</p>
+
+<h3 id="missing-debug-implementations">Missing Debug Implementations</h3>
+
+<p>The same that could be said for the last lint may be said about this one. <code class="highlighter-rouge">Debug</code>
+is a common and useful trait that may, as the name suggests, be used to debug
+Rust programs by viewing the internals of the types for which it is implemented.</p>
+
+<p>However, there are some types which ought <em>not</em> to implement <code class="highlighter-rouge">Debug</code>, the most
+notable of which are any types which contain secret data. If a type representing
+a cryptographic key implements <code class="highlighter-rouge">Debug</code>, it may end up accidentally being printed
+to a log or some other location, where an attacker may be able to read it.</p>
+
+<p><code class="highlighter-rouge">Debug</code>, same as <code class="highlighter-rouge">Copy</code>, also comes with a compilation-time cost which may not
+be desirable. This tradeoff ought to be assessed contextually.</p>
+
+<h3 id="missing-docs">Missing Docs</h3>
+
+<p>Rust makes it easy to create API documentation using the <code class="highlighter-rouge">rustdoc</code> tool, and
+ideally all publicly-exposed parts of a crate’s API will receive some degree of
+documentation. This lint helps ensure that, although it says nothing about the
+<em>quality</em> of the documentation provided.</p>
+
+<p>Consider this lint an often necessary but never sufficient part of writing
+high-quality documentation for Rust crates.</p>
+
+<h3 id="single-use-lifetimes">Single Use Lifetimes</h3>
+
+<p>If a lifetime appears in only one places, there’s a question of why it’s there
+at all. The goal of well-written lifetime constraints in functions or struct
+definitions is to make clear what the constraints are, by eliminating
+lifetimes which do not need to be explicitly named. This lint is designed to
+catch this case, making it easier to write expressive lifetimes.</p>
+
+<h3 id="trivial-casts">Trivial Casts</h3>
+
+<p>Some casts aren’t necessary, and could instead be replaced with type coercion,
+possibly or optionally with type ascription to specify the new coerced type,
+which is considered better style. This lint catches such unecessary casts.</p>
+
+<h3 id="trivial-numeric-casts">Trivial Numeric Casts</h3>
+
+<p>Similarly, some casts between numeric types aren’t necessary, and will be
+flagged by this lint.</p>
+
+<h3 id="unreachable-pub">Unreachable Pub</h3>
+
+<p>The use of <code class="highlighter-rouge">pub</code> in Rust is to declare an item as public, but if the item’s
+containing module is private, the item will itself be private, regardless
+of the visibility specified on it directly. This lint helps to catch these
+cases, which left unchecked may lead to confusion about visibility when
+reading a program’s source code.</p>
+
+<h3 id="unsafe-code">Unsafe Code</h3>
+
+<p>Unsafe code is an important part of Rust, but it’s not always desirable
+to write yourself. Writing correct unsafe code requires care and attentiveness,
+and may not be worth the effort for individual projects. To ensure no
+unsafe code is currently present, and limit its introduction in the future,
+use this lint.</p>
+
+<h3 id="unused-extern-crates">Unused Extern Crates</h3>
+
+<p>Rust 2018 substantially reduced the need to specify external crates explicitly
+in source code, but there remain reasons to do so. If an extern crate is unused,
+this lint will catch and report it.</p>
+
+<h3 id="unused-import-braces">Unused Import Braces</h3>
+
+<p>This is a simple syntactic lint to eliminate braces in imports when used around
+a single name, as they aren’t necessary.</p>
+
+<h3 id="unused-qualifications">Unused Qualifications</h3>
+
+<p>This lint catches when a name is referenced with unnecessary qualification. If a
+path has already been imported, then it’s no longer necessary to use the entire
+path to items in that name.</p>
+
+<h3 id="unused-results">Unused Results</h3>
+
+<p>Results are Rust’s core mechanism for reporting and handling errors, and as such
+it is strongly recommended to check the values of results when they’re returned.</p>
+
+<p>If a situation exists where you feel confident that a result does not need to be
+checked, you can selectively turn off the lint, ideally with a comment explaining
+why you believe it’s acceptable not to check the results contained in the function.</p>
+
+<h3 id="variant-size-differences">Variant Size Differences</h3>
+
+<p>Enums are as large as their largest variant, so if an enum has one variant which is
+substantially larger than the rest, then all uses of the enum will end up with
+substantial amounts of wasted space. This lint catches this case, and offers
+recommendations to reduce the size of the large variant.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Not all of these will make sense for your code at all, or may not make sense for
+the moment. Rejecting missing documentation isn’t worthwhile when you’re just
+starting out and aren’t prepared to write documentation for code which is highly
+subject to change. Some of these are no longer as useful with modern Rust,
+or are only useful in limited contexts.</p>
+
+<p>That said, lints like the unused copy or debug implementation lints are generally
+useful, even if you selectively ignore them in specific cases. As a default,
+deriving these traits for libraries is good. In binaries, you may not care as
+much.</p>
+
+<p>Whether you use them or not, it’s useful to be aware that these lints exist!</p>
+
+
+    </div>
+
+    
+        <div class="discuss">
+            <div class="discuss-content">
+                <section class="discuss-section">
+                    <p><strong>Possible Rust</strong> succeeds when more people can join in learning about Rust! Please take a moment to share, <em>especially</em> if you have questions or if you disagree!</p>
+
+                    <a target="_blank" href="https://twitter.com/intent/tweet?text=http://localhost:4000/patterns/rust-lints-you-may-not-know" class="button button--block">Share on Twitter</a>
+                </section>
+                <section class="discuss-section flex">
+                    
+                        <div class="discuss-empty">
+                            <div>
+                                <p>Will be updated with links to discussions soon!</p>
+                            </div>
+                        </div>
+                    
+                </section>
+            </div>
+        </div>
+    
+
+    <div class="other-posts">
+        
+            <div></div>
+        
+
+        
+            <div></div>
+        
+    </div>
 </div>
-
-<p>Hi there, my name is Andrew, and I’ve been writing Rust since version 0.8 in 2013. At the time I was a junior in college, now I work professionally on software security at <a href="https://mitre.org" title="MITRE: Solving Problems for a Safer World">MITRE</a>. I’ve written Rust every year since, and I’m still learning all the time!</p>
-
-<p>Some things I’ve gotten to do:</p>
-
-<ul>
-  <li>Teach Rust as part of an undergraduate programming language theory course.</li>
-  <li>Speak at Rust Belt Rust 2016 with a talk titled “Hello and Welcome: Documentation in the Rust Ecosystem.”</li>
-  <li>Speak at Rust Conf 2017 with a talk titled “A Tale of Teaching Rust.”</li>
-  <li>Write the (now defunct) Rust Frequently Asked Questions page.</li>
-  <li>Teach Rust for MITRE’s internal corporate education program.</li>
-</ul>
-
 
                 </div>
             </div>
