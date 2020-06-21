@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:4000/patterns/rust-lints-you-may-not-know</loc>
+<loc>http://localhost:4000/pattern/rust-lints-you-may-not-know</loc>
 <lastmod>2020-06-21T15:59:00-07:00</lastmod>
 </url>
 <url>
