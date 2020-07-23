@@ -1,13 +1,12 @@
 {
-    "short_name": "Possible Rust",
-    "name": "Possible Rust",
-    "icons": [{
-      "src": "icon.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    }],
-    "start_url": "/",
-    "background_color": "#e4edf6",
-    "theme_color": "#e4edf6"
-  }
-  
+	"short_name": "Possible Rust",
+	"name": "Possible Rust",
+	"icons": [{
+		"src": "icon.png",
+		"type": "image/png",
+		"sizes": "192x192"
+	}],
+	"start_url": "/",
+	"background_color": "#e4edf6",
+	"theme_color": "#e4edf6"
+}
