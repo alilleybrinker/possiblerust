@@ -1,4 +1,189 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-22T18:55:39-07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Possible Rust</title><subtitle>Learning what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Rust Lints You May Not Know</title><link href="http://localhost:4000/pattern/rust-lints-you-may-not-know" rel="alternate" type="text/html" title="Rust Lints You May Not Know" /><published>2020-06-21T15:59:00-07:00</published><updated>2020-06-21T15:59:00-07:00</updated><id>http://localhost:4000/pattern/rust-lints-you-may-not-know</id><content type="html" xml:base="http://localhost:4000/pattern/rust-lints-you-may-not-know">&lt;p&gt;The Rust compiler ships with a number of useful lints on by default,
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-27T18:33:23-07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Possible Rust</title><subtitle>Learning what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Enum or Trait Object</title><link href="http://localhost:4000/guide/enum-or-trait-object" rel="alternate" type="text/html" title="Enum or Trait Object" /><published>2020-07-27T17:53:00-07:00</published><updated>2020-07-27T17:53:00-07:00</updated><id>http://localhost:4000/guide/enum-or-trait-object</id><content type="html" xml:base="http://localhost:4000/guide/enum-or-trait-object">&lt;p&gt;Rust has two major mechanisms for delegating logic: enums and trait objects,
+and it may be unclear when to use one or the other. In this post, I will
+walk through how each works, what the tradeoffs are, and how to choose the
+right option for your code.&lt;/p&gt;
+
+&lt;!-- more --&gt;
+
+&lt;h2 id=&quot;enums-closed-set-of-types&quot;&gt;Enums: Closed Set of Types&lt;/h2&gt;
+
+&lt;p&gt;An enum, or &lt;em&gt;enumeration&lt;/em&gt; is a type which can be one of several distinct &lt;em&gt;variants&lt;/em&gt;,
+each possibility containing some addition data. Enums are one of Rust’s core data
+types, can look like any of the following, as examples:&lt;/p&gt;
+
+&lt;figure class=&quot;figure--code &quot; id=&quot;code-1&quot;&gt;
+    
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Result&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;Ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;Err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;E&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;enum&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IpAddress&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;V4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;u8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+    &lt;span class=&quot;nf&quot;&gt;V6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+    &lt;figcaption&gt;&lt;span&gt;Code 1&lt;/span&gt; A collection of example enums &lt;a href=&quot;#code-1&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;aside id=&quot;aside-1&quot;&gt;
+    &lt;h4&gt;Aside #1: Non-exhaustive Enums &lt;a href=&quot;#aside-1&quot; class=&quot;aside-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;
+    
+&lt;p&gt;Enums may be marked &lt;a href=&quot;https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute&quot;&gt;“non-exhaustive”&lt;/a&gt; to force users of the crate in which the type is
+defined to include a catch-all match pattern, enabling the addition of future variants
+to the enum without breaking compatibility for users.&lt;/p&gt;
+
+&lt;p&gt;Note that users of the enum within the current crate are not affected by the “non-exhaustive”
+annotation.&lt;/p&gt;
+
+
+&lt;/aside&gt;
+
+&lt;p&gt;Note that enums are, by their nature, a &lt;strong&gt;closed set of types&lt;/strong&gt;. You define a finite
+list of variants, and those are the only ones which can exist. In the future, you &lt;em&gt;can&lt;/em&gt;
+add variants yourself by modifying the definition of the enum type (and possibly changing
+call sites / users of the enum to handle the additional variant), but users of your enum
+type can’t add additional variants themselves.&lt;/p&gt;
+
+&lt;p&gt;The advantage of enums is that they are fast. Because the total list of variants is known
+at compile-time, selection of what code to execute based on the variant at hand is only
+a branch instruction.&lt;/p&gt;
+
+&lt;h2 id=&quot;trait-objects-open-set-of-types&quot;&gt;Trait Objects: Open Set of Types&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;Trait Objects&lt;/em&gt; allow for the uniform treatment of different concrete types which all
+implement the same trait, like so:&lt;/p&gt;
+
+&lt;figure class=&quot;figure--code &quot; id=&quot;code-2&quot;&gt;
+    
+&lt;div class=&quot;language-rust highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;use&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nn&quot;&gt;consts&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;/// Defines how to get the area of a shape.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;trait&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Area&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;area&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;/// A rectangular shape with a width and height.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rectangle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Area&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Rectangle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// Area for a rectangle is width times height.&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;area&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.width&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.height&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;/// A circular shape with a radius.&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Circle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;radius&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Area&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Circle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// Area for a circle is PI * r^2&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;area&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;f64&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;PI&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.radius&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;.radius&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// Make a `Vec` that holds trait objects based on the `Area`&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// trait. This lets the `Vec` hold different concrete types&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// by putting them behind a pointer, which hides what type&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// is actually there, and dispatches to the correct method&lt;/span&gt;
+    &lt;span class=&quot;c&quot;&gt;// implementations at runtime!&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shapes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Box&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dyn&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Area&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;vec!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;nn&quot;&gt;Box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Rectangle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;2.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;3.0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;}),&lt;/span&gt;
+        &lt;span class=&quot;nn&quot;&gt;Box&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Circle&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;radius&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;4.0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shapes&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;nd&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;{}&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.area&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+    &lt;figcaption&gt;&lt;span&gt;Code 2&lt;/span&gt;  &lt;a href=&quot;#code-2&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;By contrast, a trait object is an &lt;strong&gt;open set of types&lt;/strong&gt;. Trait objects are Rust’s key
+mechanism for dynamic dispatch, allowing selection at runtime at which concrete type’s
+trait method implementation should be executed.&lt;/p&gt;
+
+&lt;p&gt;This dynamic dispatch does come with a cost, as &lt;a href=&quot;http://huonw.github.io/blog/2015/01/peeking-inside-trait-objects/&quot;&gt;the vtable must be checked&lt;/a&gt; to determine
+the location of the appropriate instructions to execute.&lt;/p&gt;
+
+&lt;p&gt;The advantage with trait objects is that users can define their own types which implement the
+trait, and can then be used wherever a trait object is expected.&lt;/p&gt;
+
+&lt;p&gt;Note as well that trait objects may be represented as &lt;code class=&quot;highlighter-rouge&quot;&gt;Box&amp;lt;dyn Trait&amp;gt;&lt;/code&gt; (an owned trait object), or
+as &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;dyn Trait&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;amp;mut dyn Trait&lt;/code&gt; (borrowed trait objects). In either case, they represent an
+open set of types which uses dynamic dispatch for method execution.&lt;/p&gt;
+
+&lt;aside id=&quot;aside-2&quot;&gt;
+    &lt;h4&gt;Aside #2: Object Safety &lt;a href=&quot;#aside-2&quot; class=&quot;aside-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;
+    
+&lt;p&gt;Not all traits may be used to construct trait objects. The requirement for making a trait
+object is that the trait be “object safe.” The official book “The Rust Programming Language”
+&lt;a href=&quot;https://doc.rust-lang.org/book/ch17-02-trait-objects.html#object-safety-is-required-for-trait-objects&quot;&gt;explains object safety in Chapter 17&lt;/a&gt;.&lt;/p&gt;
+
+
+&lt;/aside&gt;
+
+&lt;h2 id=&quot;summarizing-trade-offs&quot;&gt;Summarizing Trade-Offs&lt;/h2&gt;
+
+&lt;figure class=&quot;figure--table &quot; id=&quot;table-1&quot;&gt;
+    &lt;figcaption&gt;&lt;span&gt;Table 1&lt;/span&gt; Summary of trade-offs between enums and trait objects &lt;a href=&quot;#table-1&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
+    
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Delegation Construct&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Set of Types&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Performance&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Restrictions&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Enum&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Closed&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Fast (branch)&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;N/A&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Trait Object&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Open&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Slow (vtable)&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Object Safety&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;when-to-use-them&quot;&gt;When to Use Them?&lt;/h2&gt;
+
+&lt;p&gt;With the trade-offs understood, the question is when to use one or the other. This is going to
+be dependent on your context.&lt;/p&gt;
+
+&lt;p&gt;In general, if the need for delegation is only internal, meaning you control all the variants
+which may at some point need to be constructed in the future, you’re likely better off with
+an enum. It’s faster, subject to fewer rules (no “object safety” equivalent), and makes it
+easy to see a list of all the variants which may exist.&lt;/p&gt;
+
+&lt;p&gt;If the need for delegation is exposed externally, and you want to be maximally flexible for
+users of your crate, then a trait object is the better option. While you pay a performance cost
+for the dynamic dispatch, the flexibility gained is sometimes irreplaceable.&lt;/p&gt;
+
+
+&lt;/figure&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Enums" /><category term="Trait Objects" /><summary type="html">Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.</summary></entry><entry><title type="html">Rust Lints You May Not Know</title><link href="http://localhost:4000/pattern/rust-lints-you-may-not-know" rel="alternate" type="text/html" title="Rust Lints You May Not Know" /><published>2020-06-21T15:59:00-07:00</published><updated>2020-06-21T15:59:00-07:00</updated><id>http://localhost:4000/pattern/rust-lints-you-may-not-know</id><content type="html" xml:base="http://localhost:4000/pattern/rust-lints-you-may-not-know">&lt;p&gt;The Rust compiler ships with a number of useful lints on by default,
 and many use Clippy to provide additional lints. It’s less well known
 that the Rust compiler ships with some useful lints which are set to
 &lt;code class=&quot;highlighter-rouge&quot;&gt;allow&lt;/code&gt; by default, meaning they don’t generate warnings. In this post,

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
 
         
-            <title>Rust Lints You May Not Know - Possible Rust</title>
+            <title>Enum or Trait Object - Possible Rust</title>
         
 
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -24,21 +24,21 @@
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
 <meta name="generator" content="Jekyll v4.0.0" />
-<meta property="og:title" content="Rust Lints You May Not Know" />
+<meta property="og:title" content="Enum or Trait Object" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful." />
-<meta property="og:description" content="The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful." />
-<link rel="canonical" href="http://localhost:4000/pattern/rust-lints-you-may-not-know" />
-<meta property="og:url" content="http://localhost:4000/pattern/rust-lints-you-may-not-know" />
+<meta name="description" content="Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code." />
+<meta property="og:description" content="Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code." />
+<link rel="canonical" href="http://localhost:4000/guide/enum-or-trait-object" />
+<meta property="og:url" content="http://localhost:4000/guide/enum-or-trait-object" />
 <meta property="og:site_name" content="Possible Rust" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-06-21T15:59:00-07:00" />
+<meta property="article:published_time" content="2020-07-27T17:53:00-07:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Rust Lints You May Not Know" />
+<meta property="twitter:title" content="Enum or Trait Object" />
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/pattern/rust-lints-you-may-not-know"},"url":"http://localhost:4000/pattern/rust-lints-you-may-not-know","description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","headline":"Rust Lints You May Not Know","dateModified":"2020-06-21T15:59:00-07:00","datePublished":"2020-06-21T15:59:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/guide/enum-or-trait-object"},"url":"http://localhost:4000/guide/enum-or-trait-object","description":"Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.","headline":"Enum or Trait Object","dateModified":"2020-07-27T17:53:00-07:00","datePublished":"2020-07-27T17:53:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -245,11 +245,11 @@ Feed</a>
 
                 <div class="site-content">
                             
-                        <h2 class="site-title">Rust Lints You May Not Know</h2>
+                        <h2 class="site-title">Enum or Trait Object</h2>
                         <p class="post-preview-meta">
-                            Jun 21st, 2020
- &middot;  <a href="/pattern" class="meta">Pattern</a>  
- &middot;  <a href="/tags#lints" class="meta">#lints</a>  
+                            Jul 27th, 2020
+ &middot;  <a href="/guide" class="meta">Guide</a>  
+ &middot;  <a href="/tags#enums" class="meta">#enums</a>,  <a href="/tags#trait-objects" class="meta">#trait objects</a>  
                         </p>
                     
 
@@ -257,278 +257,192 @@ Feed</a>
     
     
     <div class="post-content" role="article">
-        <p>The Rust compiler ships with a number of useful lints on by default,
-and many use Clippy to provide additional lints. It’s less well known
-that the Rust compiler ships with some useful lints which are set to
-<code class="highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
-I’ll explain what each of these lints does, and why it might be useful.</p>
+        <p>Rust has two major mechanisms for delegating logic: enums and trait objects,
+and it may be unclear when to use one or the other. In this post, I will
+walk through how each works, what the tradeoffs are, and how to choose the
+right option for your code.</p>
 
 <!-- more -->
 
-<h2 id="where-to-find-these-lints">Where to Find These Lints</h2>
+<h2 id="enums-closed-set-of-types">Enums: Closed Set of Types</h2>
 
-<p>The lists of “allowed-by-default” lints can be found in the <a href="https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html" title="List of allowed-by-default lints">“Rustc book,”</a>
-a guide to the Rust compiler produced by the Rust team. This page does a good
-job of explaining what the lints are, how to turn them on, and what effect they have
-on your code. What it doesn’t do is explain why these lints are present, or why they
-are turned off by default.</p>
+<p>An enum, or <em>enumeration</em> is a type which can be one of several distinct <em>variants</em>,
+each possibility containing some addition data. Enums are one of Rust’s core data
+types, can look like any of the following, as examples:</p>
 
-<p>For code examples for each of these lints, refer to the Rustc Book.</p>
+<figure class="figure--code " id="code-1">
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">enum</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="nf">Some</span><span class="p">(</span><span class="n">T</span><span class="p">),</span>
+    <span class="nb">None</span><span class="p">,</span>
+<span class="p">}</span>
 
-<h2 id="the-lints">The Lints</h2>
+<span class="k">enum</span> <span class="n">Result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">E</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="nf">Ok</span><span class="p">(</span><span class="n">T</span><span class="p">),</span>
+    <span class="nf">Err</span><span class="p">(</span><span class="n">E</span><span class="p">),</span>
+<span class="p">}</span>
 
-<h3 id="anonymous-parameters">Anonymous Parameters</h3>
+<span class="k">enum</span> <span class="n">IpAddress</span> <span class="p">{</span>
+    <span class="nf">V4</span><span class="p">(</span><span class="nb">u8</span><span class="p">,</span> <span class="nb">u8</span><span class="p">,</span> <span class="nb">u8</span><span class="p">,</span> <span class="nb">u8</span><span class="p">),</span>
+    <span class="nf">V6</span><span class="p">(</span><span class="nb">String</span><span class="p">),</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
-<p>Rust 2015 allowed parameter names to be omitted in trait definitions, in a manner
-similar to the ability in C or C++ to omit parameter names for function prototypes
-in header files. However, it was considered poor style, and support for it was
-removed with Rust 2018.</p>
-
-<p>Resolving this lint is easy. If you don’t want to have to name the parameters, you can
-use the name <code class="highlighter-rouge">_</code>, which is Rust’s standard name for ignoring values. However, the
-purpose of this lint is to encourage you to provide useful, meaningful names for the
-parameters.</p>
-
-<h3 id="box-pointers">Box Pointers</h3>
-
-<p>Before Rust offered a mechanism to change the default allocator, one had to implement
-their own version of <code class="highlighter-rouge">Box</code> which used a different underying allocator. In that situation,
-it was desirable for the compiler to flag if you still used the standard <code class="highlighter-rouge">Box</code> type, as
-that would <em>not</em> use the custom allocator you intended.</p>
-
-<p>Today, Rust programs can freely change the default allocator, removing the common need
-for this lint. Otherwise, it’s useful if you wish to disallow heap allocation, although
-there remain other types (like <code class="highlighter-rouge">Vec</code>) which allocate data on the heap, so this lint would
-be useful, but not sufficient, for ensuring no heap allocations occur.</p>
-
-<h3 id="elided-lifetime-in-path">Elided Lifetime in Path</h3>
-
-<p>It is often desirable to omit specification of lifetimes in places where there do not
-exist meaningful constraints against them. To support this, and make writing Rust
-programs simpler, Rust permits elision of lifetimes, and will apply a set of rules for
-filling in lifetime information.</p>
-
-<p>However, the elision of lifetimes comes with a tradeoff, as it may no longer be clear
-when a data type contains references. Given that references must obey a restriction of
-aliasing XOR mutability, not knowing a type contains references may lead one to writing
-code which violates those restrictions unintentionally, and is therefore rejected by
-the compiler.</p>
-
-<p>This lint disallows lifetime elision in paths, requiring consistent clarity on the
-presence of borrowed data. It trades off clarity of syntax for clarity of semantics, and
-its application is a matter of taste.</p>
-
-<h3 id="missing-copy-implementations">Missing Copy Implementations</h3>
+    <figcaption><span>Code 1</span> A collection of example enums <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+</figure>
 
 <aside id="aside-1">
-    <h4>Aside #1: When to Implement <code>Copy</code> <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
+    <h4>Aside #1: Non-exhaustive Enums <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
     
-<p>You may also consider the performance implications of implementing <code class="highlighter-rouge">Copy</code>, which by
-definition is implemented as a <code class="highlighter-rouge">memcpy</code> of the bytes containing the type. If the size
-of the type is larger than the size of a pointer on the host architecture (a <code class="highlighter-rouge">usize</code>),
-then the cost of copying the type will be higher than the cost of copying a pointer to
-the type (which is what’s passed when working with references).</p>
+<p>Enums may be marked <a href="https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute">“non-exhaustive”</a> to force users of the crate in which the type is
+defined to include a catch-all match pattern, enabling the addition of future variants
+to the enum without breaking compatibility for users.</p>
+
+<p>Note that users of the enum within the current crate are not affected by the “non-exhaustive”
+annotation.</p>
+
 
 </aside>
 
-<p>In general, it is considered good Rust practice to implement common traits like <code class="highlighter-rouge">Copy</code>
-for types which are able to implement them. This recommendation is enshrined in the
-Rust API guidelines, and is intended to make types provided by Rust crates usable
-in as wide a variety of contexts as possible.</p>
+<p>Note that enums are, by their nature, a <strong>closed set of types</strong>. You define a finite
+list of variants, and those are the only ones which can exist. In the future, you <em>can</em>
+add variants yourself by modifying the definition of the enum type (and possibly changing
+call sites / users of the enum to handle the additional variant), but users of your enum
+type can’t add additional variants themselves.</p>
 
-<p>This lint helps make sure you don’t forget to implement <code class="highlighter-rouge">Copy</code>, one of the simpler
-and more useful common traits, when possible.</p>
+<p>The advantage of enums is that they are fast. Because the total list of variants is known
+at compile-time, selection of what code to execute based on the variant at hand is only
+a branch instruction.</p>
 
-<p>However, there are a couple important notes to make. First, there are types which
-one may <em>not</em> want to implement <code class="highlighter-rouge">Copy</code> for. For example, a type which is designed
-to generate monotonically increasing ID numbers probably should not be copied,
-lest you end up with two generators generating duplicate IDs. Second, there is a
-cost in compile times for generating trait implementations, and so removing
-excess trait impls may be desirable for reducing the compilation time of a crate.</p>
+<h2 id="trait-objects-open-set-of-types">Trait Objects: Open Set of Types</h2>
+
+<p><em>Trait Objects</em> allow for the uniform treatment of different concrete types which all
+implement the same trait, like so:</p>
+
+<figure class="figure--code " id="code-2">
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">f64</span><span class="p">::</span><span class="nn">consts</span><span class="p">::</span><span class="n">PI</span><span class="p">;</span>
+
+<span class="c">/// Defines how to get the area of a shape.</span>
+<span class="k">trait</span> <span class="n">Area</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c">/// A rectangular shape with a width and height.</span>
+<span class="k">struct</span> <span class="n">Rectangle</span> <span class="p">{</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">Area</span> <span class="k">for</span> <span class="n">Rectangle</span> <span class="p">{</span>
+    <span class="c">// Area for a rectangle is width times height.</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+        <span class="k">self</span><span class="py">.width</span> <span class="o">*</span> <span class="k">self</span><span class="py">.height</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">/// A circular shape with a radius.</span>
+<span class="k">struct</span> <span class="n">Circle</span> <span class="p">{</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">Area</span> <span class="k">for</span> <span class="n">Circle</span> <span class="p">{</span>
+    <span class="c">// Area for a circle is PI * r^2</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+        <span class="n">PI</span> <span class="o">*</span> <span class="k">self</span><span class="py">.radius</span> <span class="o">*</span> <span class="k">self</span><span class="py">.radius</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c">// Make a `Vec` that holds trait objects based on the `Area`</span>
+    <span class="c">// trait. This lets the `Vec` hold different concrete types</span>
+    <span class="c">// by putting them behind a pointer, which hides what type</span>
+    <span class="c">// is actually there, and dispatches to the correct method</span>
+    <span class="c">// implementations at runtime!</span>
+    <span class="k">let</span> <span class="n">shapes</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">Box</span><span class="o">&lt;</span><span class="n">dyn</span> <span class="n">Area</span><span class="o">&gt;&gt;</span> <span class="o">=</span> <span class="nd">vec!</span><span class="p">[</span>
+        <span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">Rectangle</span> <span class="p">{</span> <span class="n">width</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="mf">3.0</span> <span class="p">}),</span>
+        <span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">Circle</span> <span class="p">{</span> <span class="n">radius</span><span class="p">:</span> <span class="mf">4.0</span> <span class="p">})</span>
+    <span class="p">];</span>
+
+    <span class="k">for</span> <span class="n">shape</span> <span class="n">in</span> <span class="o">&amp;</span><span class="n">shapes</span> <span class="p">{</span>
+        <span class="nd">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span> <span class="n">shape</span><span class="nf">.area</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span>Code 2</span>  <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+</figure>
+
+<p>By contrast, a trait object is an <strong>open set of types</strong>. Trait objects are Rust’s key
+mechanism for dynamic dispatch, allowing selection at runtime at which concrete type’s
+trait method implementation should be executed.</p>
+
+<p>This dynamic dispatch does come with a cost, as <a href="http://huonw.github.io/blog/2015/01/peeking-inside-trait-objects/">the vtable must be checked</a> to determine
+the location of the appropriate instructions to execute.</p>
+
+<p>The advantage with trait objects is that users can define their own types which implement the
+trait, and can then be used wherever a trait object is expected.</p>
+
+<p>Note as well that trait objects may be represented as <code class="highlighter-rouge">Box&lt;dyn Trait&gt;</code> (an owned trait object), or
+as <code class="highlighter-rouge">&amp;dyn Trait</code> or <code class="highlighter-rouge">&amp;mut dyn Trait</code> (borrowed trait objects). In either case, they represent an
+open set of types which uses dynamic dispatch for method execution.</p>
 
 <aside id="aside-2">
-    <h4>Aside #2: The <code>Copy</code> Restriction <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
+    <h4>Aside #2: Object Safety <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
     
-<p>When you implement <code class="highlighter-rouge">Copy</code> for a type, you place a restriction on future changes to
-that type. <code class="highlighter-rouge">Copy</code> may only be implemented for types without interior pointers, so
-implementing <code class="highlighter-rouge">Copy</code> in a public API is a promise the type will not contain pointers
-in the future. Removing a trait is always a breaking change, so be aware of the
-commitment you’re making when implementing <code class="highlighter-rouge">Copy</code> for a public type.</p>
+<p>Not all traits may be used to construct trait objects. The requirement for making a trait
+object is that the trait be “object safe.” The official book “The Rust Programming Language”
+<a href="https://doc.rust-lang.org/book/ch17-02-trait-objects.html#object-safety-is-required-for-trait-objects">explains object safety in Chapter 17</a>.</p>
+
 
 </aside>
 
-<p>In cases where a particular type ought not to be copied, or where the cost of deriving
-excess traits is too high, you may assign an item attribute which selectively sets this
-lint to <code class="highlighter-rouge">allow</code>. Ideally, this would be accompanied by a comment explaining the
-reasoning behind the exception.</p>
+<h2 id="summarizing-trade-offs">Summarizing Trade-Offs</h2>
 
-<h3 id="missing-debug-implementations">Missing Debug Implementations</h3>
-
-<p>The same that could be said for the last lint may be said about this one. <code class="highlighter-rouge">Debug</code>
-is a common and useful trait that may, as the name suggests, be used to debug
-Rust programs by viewing the internals of the types for which it is implemented.</p>
-
-<aside id="aside-3">
-    <h4>Aside #3: <code>Debug</code> for Secrets <a href="#aside-3" class="aside-link"><span>↺</span></a></h4>
+<figure class="figure--table " id="table-1">
+    <figcaption><span>Table 1</span> Summary of trade-offs between enums and trait objects <a href="#table-1" class="figure-link"><span>↺</span></a></figcaption>
     
-<p>Another option when dealing with <code class="highlighter-rouge">Debug</code> for secret data is to implement it manually
-in a manner that doesn’t print the secret. That way it doesn’t interfere with types
-which contain it and want to implement <code class="highlighter-rouge">Debug</code>, but also avoids the risk of accidental
-disclosure.</p>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Delegation Construct</th>
+      <th style="text-align: left">Set of Types</th>
+      <th style="text-align: left">Performance</th>
+      <th style="text-align: left">Restrictions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Enum</td>
+      <td style="text-align: left">Closed</td>
+      <td style="text-align: left">Fast (branch)</td>
+      <td style="text-align: left">N/A</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Trait Object</td>
+      <td style="text-align: left">Open</td>
+      <td style="text-align: left">Slow (vtable)</td>
+      <td style="text-align: left">Object Safety</td>
+    </tr>
+  </tbody>
+</table>
 
-</aside>
+<h2 id="when-to-use-them">When to Use Them?</h2>
 
-<p>However, there are some types which ought <em>not</em> to implement <code class="highlighter-rouge">Debug</code>, the most
-notable of which are any types which contain secret data. If a type representing
-a cryptographic key implements <code class="highlighter-rouge">Debug</code>, it may end up accidentally being printed
-to a log or some other location, where an attacker may be able to read it.</p>
+<p>With the trade-offs understood, the question is when to use one or the other. This is going to
+be dependent on your context.</p>
 
-<p><code class="highlighter-rouge">Debug</code>, same as <code class="highlighter-rouge">Copy</code>, also comes with a compilation-time cost which may not
-be desirable. This tradeoff ought to be assessed contextually.</p>
+<p>In general, if the need for delegation is only internal, meaning you control all the variants
+which may at some point need to be constructed in the future, you’re likely better off with
+an enum. It’s faster, subject to fewer rules (no “object safety” equivalent), and makes it
+easy to see a list of all the variants which may exist.</p>
 
-<h3 id="missing-docs">Missing Docs</h3>
-
-<p>Rust makes it easy to create API documentation using the <code class="highlighter-rouge">rustdoc</code> tool, and
-ideally all publicly-exposed parts of a crate’s API will receive some degree of
-documentation. This lint helps ensure that, although it says nothing about the
-<em>quality</em> of the documentation provided.</p>
-
-<p>Consider this lint an often necessary but never sufficient part of writing
-high-quality documentation for Rust crates.</p>
-
-<h3 id="single-use-lifetimes">Single Use Lifetimes</h3>
-
-<p>If a lifetime appears in only one places, there’s a question of why it’s there
-at all. The goal of well-written lifetime constraints in functions or struct
-definitions is to make clear what the constraints are, by eliminating
-lifetimes which do not need to be explicitly named. This lint is designed to
-catch this case, making it easier to write expressive lifetimes.</p>
-
-<h3 id="trivial-casts">Trivial Casts</h3>
-
-<p>Some casts aren’t necessary, and could instead be replaced with type coercion,
-possibly or optionally with type ascription to specify the new coerced type,
-which is considered better style. This lint catches such unecessary casts.</p>
-
-<h3 id="trivial-numeric-casts">Trivial Numeric Casts</h3>
-
-<p>Similarly, some casts between numeric types aren’t necessary, and will be
-flagged by this lint.</p>
-
-<div class="box box--info">
-    <header class="box-header">
-        <h4 class="box-title"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>note</title>
-<path d="M29.395 2.58c-1.645-1.643-3.811-2.58-5.946-2.58-1.801 0-3.459 0.668-4.67 1.877l-4.867 4.904c-0.015 0.014-0.032 0.023-0.047 0.038-0.008 0.008-0.013 0.019-0.021 0.026l0.002 0.002-10.329 10.409c-0.476 0.473-0.821 1.062-1.013 1.705l-2.349 8.508c-0.002 0.023-0.155 0.691-0.155 1.031 0 1.932 1.569 3.5 3.504 3.5 0.385 0 1.13-0.184 1.157-0.188l8.478-2.229c0.644-0.191 1.229-0.539 1.705-1.016l15.263-15.383c2.776-2.778 2.463-7.434-0.712-10.604zM16.014 23.795c-0.082-0.902-0.337-1.787-0.719-2.627l9.455-9.454c0.578 1.826 0.281 3.736-0.986 5.004-0.008 0.008-0.018 0.013-0.025 0.021l0.014 0.013-7.728 7.79c0-0.249 0.012-0.493-0.011-0.747zM14.793 20.256c-0.373-0.613-0.797-1.205-1.322-1.729-0.611-0.611-1.312-1.090-2.044-1.492l9.532-9.532c0.748 0.332 1.465 0.805 2.098 1.438 0.541 0.539 0.959 1.143 1.281 1.771l-9.545 9.544zM10.486 16.562c-0.926-0.373-1.896-0.586-2.868-0.599l7.703-7.762c1.179-1.15 2.896-1.481 4.587-1.062l-9.422 9.423zM4.167 29.873c-0.109 0.025-0.448 0.111-0.678 0.127-0.822-0.010-1.489-0.678-1.489-1.5 0.012-0.168 0.079-0.457 0.102-0.562l1.053-3.814c1.143-0.031 2.373 0.414 3.34 1.383 0.982 0.98 1.444 2.234 1.394 3.391l-3.722 0.975zM8.874 28.637c-0.024-1.342-0.57-2.738-1.672-3.838-1.042-1.043-2.406-1.645-3.766-1.699l0.996-3.607c0.072-0.24 0.215-0.477 0.391-0.684 2.006-1.436 5.091-1.012 7.234 1.133 2.267 2.266 2.617 5.586 0.871 7.568-0.116 0.061-0.233 0.119-0.359 0.156l-3.695 0.971zM28.691 11.772l-1.684 1.697c0-0.226 0.027-0.443 0.006-0.674-0.176-1.935-1.078-3.806-2.543-5.269-1.629-1.63-3.789-2.565-5.928-2.571l1.656-1.67c0.829-0.827 1.986-1.285 3.251-1.285 1.609 0 3.262 0.728 4.533 1.995 1.193 1.191 1.904 2.671 2.006 4.168 0.094 1.397-0.367 2.678-1.297 3.609z"></path>
-</svg>
- A Useful Supplementary Lint</h4>
-    </header>
-    <div class="box-body">
-        <div class="box-content">
-            
-<p>Clippy offers a useful lint called <a href="https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless “Documentation for the cast_lossless Clippy lint”">“cast lossless”</a>,
-which flags uses of <code class="highlighter-rouge">as</code>-conversions which could be replaced by generally
-clearer and safer <code class="highlighter-rouge">Into</code>/<code class="highlighter-rouge">From</code>-conversions which, unlike <code class="highlighter-rouge">as</code>-conversions,
-are guaranteed to be lossless.</p>
+<p>If the need for delegation is exposed externally, and you want to be maximally flexible for
+users of your crate, then a trait object is the better option. While you pay a performance cost
+for the dynamic dispatch, the flexibility gained is sometimes irreplaceable.</p>
 
 
-        </div>
-    </div>
-</div>
-
-<h3 id="unreachable-pub">Unreachable Pub</h3>
-
-<p>The use of <code class="highlighter-rouge">pub</code> in Rust is to declare an item as public, but if the item’s
-containing module is private, the item will itself be private, regardless
-of the visibility specified on it directly. This lint helps to catch these
-cases, which left unchecked may lead to confusion about visibility when
-reading a program’s source code.</p>
-
-<h3 id="unsafe-code">Unsafe Code</h3>
-
-<p>Unsafe code is an important part of Rust, but it’s not always desirable
-to write yourself. Writing correct unsafe code requires care and attentiveness,
-and may not be worth the effort for individual projects. To ensure no
-unsafe code is currently present, and limit its introduction in the future,
-use this lint.</p>
-
-<h3 id="unused-extern-crates">Unused Extern Crates</h3>
-
-<p>Rust 2018 substantially reduced the need to specify external crates explicitly
-in source code, but there remain reasons to do so. If an extern crate is unused,
-this lint will catch and report it.</p>
-
-<h3 id="unused-import-braces">Unused Import Braces</h3>
-
-<p>This is a simple syntactic lint to eliminate braces in imports when used around
-a single name, as they aren’t necessary.</p>
-
-<h3 id="unused-qualifications">Unused Qualifications</h3>
-
-<p>This lint catches when a name is referenced with unnecessary qualification. If a
-path has already been imported, then it’s no longer necessary to use the entire
-path to items in that name.</p>
-
-<h3 id="unused-results">Unused Results</h3>
-
-<p>Results are Rust’s core mechanism for reporting and handling errors, and as such
-it is strongly recommended to check the values of results when they’re returned.</p>
-
-<p>If a situation exists where you feel confident that a result does not need to be
-checked, you can selectively turn off the lint, ideally with a comment explaining
-why you believe it’s acceptable not to check the results contained in the function.</p>
-
-<h3 id="variant-size-differences">Variant Size Differences</h3>
-
-<p>Enums are as large as their largest variant, so if an enum has one variant which is
-substantially larger than the rest, then all uses of the enum will end up with
-substantial amounts of wasted space. This lint catches this case, and offers
-recommendations to reduce the size of the large variant.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Not all of these will make sense for your code at all, or may not make sense for
-the moment. Rejecting missing documentation isn’t worthwhile when you’re just
-starting out and aren’t prepared to write documentation for code which is highly
-subject to change. Some of these are no longer as useful with modern Rust,
-or are only useful in limited contexts.</p>
-
-<p>That said, lints like the unused copy or debug implementation lints are generally
-useful, even if you selectively ignore them in specific cases. As a default,
-deriving these traits for libraries is good. In binaries, you may not care as
-much.</p>
-
-<p>Whether you use them or not, it’s useful to be aware that these lints exist!</p>
-
-<div class="box box--correction">
-    <header class="box-header">
-        <h4 class="box-title"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>file</title>
-<path d="M29.363 4.637c3.516 3.514 3.516 9.213 0 12.727l-10.967 10.968c-0.391 0.392-1.023 0.392-1.414 0-0.393-0.391-0.393-1.022 0-1.414l10.826-10.827c2.734-2.734 2.734-7.164-0.002-9.899-2.73-2.734-7.164-2.734-9.898 0l-14.447 14.277c-1.953 1.952-1.953 5.118 0 7.070 1.953 1.953 5.117 1.953 7.070 0l14.59-14.417c1.17-1.17 1.17-3.073 0-4.243s-3.072-1.169-4.242 0l-10.969 10.969c-0.391 0.391-1.023 0.391-1.414 0-0.391-0.392-0.391-1.023 0-1.415l10.968-10.968c1.951-1.952 5.117-1.952 7.070 0s1.953 5.118 0 7.071l-14.59 14.418c-2.728 2.729-7.169 2.729-9.898 0s-2.729-7.171 0-9.9l14.59-14.417c3.514-3.516 9.213-3.516 12.727 0z"></path>
-</svg>
- Corrections</h4>
-    </header>
-    <div class="box-body">
-        <div class="box-content">
-            
-<h3 id="anonymous-parameters-arent-allowed-in-rust-2018">Anonymous Parameters Aren’t Allowed in Rust 2018</h3>
-
-<p>In the initial version of the post I incorrectly described the state of anomyous
-parameters in modern Rust. While such parameters are poor style in Rust 2015, they
-are not permitted at all in Rust 2018.</p>
-
-<h3 id="bare-trait-objects-now-a-warning-in-both-editions">Bare Trait Objects Now a Warning in Both Editions</h3>
-
-<p>In the initial version of this post I incorrectly described the current state of the
-bare trait object lint as being allowed by default. In fact, this lint is now set to
-warn by default in both Rust 2015 and 2018, and has therefore been removed from
-this post.</p>
-
-        </div>
-    </div>
-</div>
+</figure>
 
 
     </div>
@@ -539,25 +453,15 @@ this post.</p>
                 <section class="discuss-section">
                     <p><strong>Possible Rust</strong> succeeds when more people can join in learning about Rust! Please take a moment to share, <em>especially</em> if you have questions or if you disagree!</p>
 
-                    <a target="_blank" href="https://twitter.com/intent/tweet?text=https://possiblerust.com/pattern/rust-lints-you-may-not-know" class="button button--block">Share on Twitter</a>
+                    <a target="_blank" href="https://twitter.com/intent/tweet?text=https://possiblerust.com/guide/enum-or-trait-object" class="button button--block">Share on Twitter</a>
                 </section>
-                <section class="discuss-section ">
+                <section class="discuss-section flex">
                     
-                        <h4>Discussions</h4>
-
-                        <ul class="discuss-list">
-                            
-                            
-                            
-                            
-                                <li class="discuss-list-item"><a target="_blank" href="https://www.reddit.com/r/rust/comments/hdgodw/rust_lints_you_may_not_know/"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>reddit</title>
-<path d="M28.111 5.022l-1.215-3.655c-0.271-0.817-1.035-1.367-1.896-1.367h-18c-0.862 0-1.625 0.55-1.898 1.367l-1.225 3.657c-1.044 0.067-1.877 0.915-1.877 1.976v3c0 1.104 0.896 2 2 2h1.034c0 0.075-0.030 0.146-0.021 0.221l2 18c0.112 1.011 0.967 1.779 1.987 1.779h14c1.020 0 1.875-0.768 1.986-1.779l2-18c0.010-0.075-0.021-0.146-0.021-0.221h1.035c1.104 0 2-0.896 2-2v-3c0-1.065-0.84-1.917-1.889-1.978zM7 2h18l1 3h-20l1-3zM9 30l-0.333-3h14.666l-0.333 3h-14zM23.443 26h-14.888l-1.111-10h17.111l-1.112 10zM24.666 15h-17.333l-0.333-3h18l-0.334 3zM28 10h-24v-3h24v3z"></path>
-</svg>
- Discuss on /r/Rust</a></li>
-                            
-                        </ul>
+                        <div class="discuss-empty">
+                            <div>
+                                <p>Will be updated with links to discussions soon!</p>
+                            </div>
+                        </div>
                     
                 </section>
             </div>
@@ -566,14 +470,14 @@ this post.</p>
 
     <div class="other-posts">
         
-            <a href="/guide/enum-or-trait-object">
-                <span>Newer Post</span>
-                <h4>Enum or Trait Object</h4>
-            </a>
+            <div></div>
         
 
         
-            <div></div>
+            <a href="/pattern/rust-lints-you-may-not-know">
+                <span>Older Post</span>
+                <h4>Rust Lints You May Not Know</h4>
+            </a>
         
     </div>
 </div>
