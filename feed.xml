@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-07-27T18:56:08-07:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Possible Rust</title><subtitle>Learning what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Enum or Trait Object</title><link href="http://localhost:4000/guide/enum-or-trait-object" rel="alternate" type="text/html" title="Enum or Trait Object" /><published>2020-07-27T17:53:00-07:00</published><updated>2020-07-27T17:53:00-07:00</updated><id>http://localhost:4000/guide/enum-or-trait-object</id><content type="html" xml:base="http://localhost:4000/guide/enum-or-trait-object">&lt;p&gt;Rust has two major mechanisms for delegating logic: enums and trait objects,
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://www.possiblerust.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.possiblerust.com/" rel="alternate" type="text/html" /><updated>2020-07-29T18:12:19-07:00</updated><id>https://www.possiblerust.com/feed.xml</id><title type="html">Possible Rust</title><subtitle>Learning what&amp;rsquo;s possible in Rust.</subtitle><author><name>{&quot;picture&quot;=&gt;&quot;https://www.possiblerust.com/assets/img/me.jpg&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><entry><title type="html">Enum or Trait Object</title><link href="https://www.possiblerust.com/guide/enum-or-trait-object" rel="alternate" type="text/html" title="Enum or Trait Object" /><published>2020-07-27T17:53:00-07:00</published><updated>2020-07-27T17:53:00-07:00</updated><id>https://www.possiblerust.com/guide/enum-or-trait-object</id><content type="html" xml:base="https://www.possiblerust.com/guide/enum-or-trait-object">&lt;p&gt;Rust has two major mechanisms for delegating logic: enums and trait objects,
 and it may be unclear when to use one or the other. In this post, I will
 walk through how each works, what the tradeoffs are, and how to choose the
 right option for your code.&lt;/p&gt;
@@ -32,6 +32,12 @@ types, can look like any of the following, as examples:&lt;/p&gt;
     &lt;figcaption&gt;&lt;span&gt;Code 1&lt;/span&gt; A collection of example enums &lt;a href=&quot;#code-1&quot; class=&quot;figure-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/figcaption&gt;
 &lt;/figure&gt;
 
+&lt;p&gt;Note that enums are, by their nature, a &lt;strong&gt;closed set of types&lt;/strong&gt;. You define a finite
+list of variants, and those are the only ones which can exist. In the future, you &lt;em&gt;can&lt;/em&gt;
+add variants yourself by modifying the definition of the enum type (and possibly changing
+call sites / users of the enum to handle the additional variant), but users of your enum
+type can’t add additional variants themselves.&lt;/p&gt;
+
 &lt;aside id=&quot;aside-1&quot;&gt;
     &lt;h4&gt;Aside #1: Non-exhaustive Enums &lt;a href=&quot;#aside-1&quot; class=&quot;aside-link&quot;&gt;&lt;span&gt;↺&lt;/span&gt;&lt;/a&gt;&lt;/h4&gt;
     
@@ -44,12 +50,6 @@ annotation.&lt;/p&gt;
 
 
 &lt;/aside&gt;
-
-&lt;p&gt;Note that enums are, by their nature, a &lt;strong&gt;closed set of types&lt;/strong&gt;. You define a finite
-list of variants, and those are the only ones which can exist. In the future, you &lt;em&gt;can&lt;/em&gt;
-add variants yourself by modifying the definition of the enum type (and possibly changing
-call sites / users of the enum to handle the additional variant), but users of your enum
-type can’t add additional variants themselves.&lt;/p&gt;
 
 &lt;p&gt;The advantage of enums is that they are fast. Because the total list of variants is known
 at compile-time, selection of what code to execute based on the variant at hand is only
@@ -183,7 +183,7 @@ users of your crate, then a trait object is the better option. While you pay a p
 for the dynamic dispatch, the flexibility gained is sometimes irreplaceable.&lt;/p&gt;
 
 
-&lt;/figure&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Enums" /><category term="Trait Objects" /><summary type="html">Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.</summary></entry><entry><title type="html">Rust Lints You May Not Know</title><link href="http://localhost:4000/pattern/rust-lints-you-may-not-know" rel="alternate" type="text/html" title="Rust Lints You May Not Know" /><published>2020-06-21T15:59:00-07:00</published><updated>2020-06-21T15:59:00-07:00</updated><id>http://localhost:4000/pattern/rust-lints-you-may-not-know</id><content type="html" xml:base="http://localhost:4000/pattern/rust-lints-you-may-not-know">&lt;p&gt;The Rust compiler ships with a number of useful lints on by default,
+&lt;/figure&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;https://www.possiblerust.com/assets/img/me.jpg&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Enums" /><category term="Trait Objects" /><summary type="html">Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.</summary></entry><entry><title type="html">Rust Lints You May Not Know</title><link href="https://www.possiblerust.com/pattern/rust-lints-you-may-not-know" rel="alternate" type="text/html" title="Rust Lints You May Not Know" /><published>2020-06-21T15:59:00-07:00</published><updated>2020-06-21T15:59:00-07:00</updated><id>https://www.possiblerust.com/pattern/rust-lints-you-may-not-know</id><content type="html" xml:base="https://www.possiblerust.com/pattern/rust-lints-you-may-not-know">&lt;p&gt;The Rust compiler ships with a number of useful lints on by default,
 and many use Clippy to provide additional lints. It’s less well known
 that the Rust compiler ships with some useful lints which are set to
 &lt;code class=&quot;highlighter-rouge&quot;&gt;allow&lt;/code&gt; by default, meaning they don’t generate warnings. In this post,
@@ -454,4 +454,4 @@ this post.&lt;/p&gt;
 
         &lt;/div&gt;
     &lt;/div&gt;
-&lt;/div&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;/assets/img/me.png&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Lints" /><summary type="html">The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.</summary></entry></feed>
+&lt;/div&gt;</content><author><name>{&quot;picture&quot;=&gt;&quot;https://www.possiblerust.com/assets/img/me.jpg&quot;, &quot;twitter&quot;=&gt;&quot;alilleybrinker&quot;}</name></author><category term="Lints" /><summary type="html">The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.</summary></entry></feed>
