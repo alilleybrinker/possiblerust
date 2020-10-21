@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Possible Rust" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -37,7 +37,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/","description":"Learning what’s possible in Rust.","headline":"Possible Rust","sameAs":["https://twitter.com/PossibleRust"],"@type":"WebSite","name":"PossibleRust","@context":"https://schema.org"}</script>
+{"sameAs":["https://twitter.com/PossibleRust"],"headline":"Possible Rust","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"description":"Learning what’s possible in Rust.","url":"https://www.possiblerust.com/","@type":"WebSite","name":"PossibleRust","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -229,6 +229,10 @@
                     <a class="plain" href="/tags#opinion">#opinion<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#generics">#generics<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -273,6 +277,31 @@ Feed</a>
                     
 
                     
+    <article class="post-preview ">
+        
+            <header class="post-preview-header">
+                <h2 class="post-preview-title"><a href="/pattern/non-generic-inner-functions" class="plain">Non-Generic Inner Functions</a></h2>
+            </header>
+
+            
+
+            <p>Steve Klabnik recently wrote about <a href="https://steveklabnik.com/writing/are-out-parameters-idiomatic-in-rust">whether out parameters are idiomatic in Rust</a>. The post
+ends by showing a snippet of code: a generic function, with a non-generic function inside of
+it which contains the actual implementation. Steve says this pattern may warrant its own post,
+so here is that post, where I’ll explain why this inner function is useful, discuss the
+trade-offs of doing it, and describe why this pattern will hopefully not be necessary in
+the future.</p>
+
+
+
+            <p class="post-preview-meta">
+                Oct 20th, 2020
+ &middot;  <a href="/pattern" class="meta">Pattern</a>  
+ &middot;  <a href="/tags#generics" class="meta">#generics</a>  
+            </p>
+        
+    </article>
+
     <article class="post-preview ">
         
             <header class="post-preview-header">
@@ -357,7 +386,7 @@ right option for your code.</p>
             <p>The Rust compiler ships with a number of useful lints on by default,
 and many use Clippy to provide additional lints. It’s less well known
 that the Rust compiler ships with some useful lints which are set to
-<code class="highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
+<code class="language-plaintext highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
 I’ll explain what each of these lints does, and why it might be useful.</p>
 
 

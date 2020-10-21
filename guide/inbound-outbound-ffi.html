@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Inbound &amp; Outbound FFI" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/inbound-outbound-ffi"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/guide/inbound-outbound-ffi","description":"Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of new languages into existing codebases or building on existing libraries. That said, the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the area can seem overwhelming to approach. In this post, I explain the two “directions” of FFI, some patterns for how FFI in each direction is handled in Rust and further break down some FFI design approaches.","headline":"Inbound &amp; Outbound FFI","dateModified":"2020-08-05T18:10:00-07:00","datePublished":"2020-08-05T18:10:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"dateModified":"2020-08-05T18:10:00-07:00","datePublished":"2020-08-05T18:10:00-07:00","headline":"Inbound &amp; Outbound FFI","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/inbound-outbound-ffi"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"description":"Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of new languages into existing codebases or building on existing libraries. That said, the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the area can seem overwhelming to approach. In this post, I explain the two “directions” of FFI, some patterns for how FFI in each direction is handled in Rust and further break down some FFI design approaches.","url":"https://www.possiblerust.com/guide/inbound-outbound-ffi","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -231,6 +231,10 @@
                     <a class="plain" href="/tags#opinion">#opinion<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#generics">#generics<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -316,9 +320,9 @@ in play.</p>
 <p>In Rust, that means:</p>
 
 <ul>
-  <li>Data types that are marked <a href="https://doc.rust-lang.org/reference/type-layout.html#the-c-representation"><code class="highlighter-rouge">#[repr(C)]</code></a>, meaning they have the same hardware
+  <li>Data types that are marked <a href="https://doc.rust-lang.org/reference/type-layout.html#the-c-representation"><code class="language-plaintext highlighter-rouge">#[repr(C)]</code></a>, meaning they have the same hardware
 representation as the equivalent C data type would have.</li>
-  <li>Functions inside an <a href="https://doc.rust-lang.org/std/keyword.extern.html"><code class="highlighter-rouge">extern "C"</code></a> block, with only a function signature provided,
+  <li>Functions inside an <a href="https://doc.rust-lang.org/std/keyword.extern.html"><code class="language-plaintext highlighter-rouge">extern "C"</code></a> block, with only a function signature provided,
 telling the compiler that this function exists and will be provided by some
 other library at link time.</li>
 </ul>
@@ -339,7 +343,7 @@ amenable to the kind of architecture Rust’s rules encourage.</p>
 <aside id="aside-1">
     <h4>Aside #1: An example of problematic cross-language patterns <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
     
-<p>The <a href="https://radek.io/2012/11/10/magical-container_of-macro/"><code class="highlighter-rouge">container_of</code></a> macro from the Linux kernel is a good example of something that is
+<p>The <a href="https://radek.io/2012/11/10/magical-container_of-macro/"><code class="language-plaintext highlighter-rouge">container_of</code></a> macro from the Linux kernel is a good example of something that is
 natural in C and would be rejected by Rust. The macro takes in a pointer to a field of a
 struct, the name of the type of the struct, and the name of the field in the struct, and
 returns a pointer to the overall container.</p>
@@ -357,8 +361,8 @@ make it feel natural in a Rust codebase.</p>
 
 <p>The next step is therefore usually to write a wrapper around the bindings which provides
 a more natural and idiomatic API for use in Rust. Commonly this pattern manifests with
-two crates, one called <code class="highlighter-rouge">*-sys</code> (replacing <code class="highlighter-rouge">*</code> with the name of the original API you’re
-binding to), and the other without the <code class="highlighter-rouge">*-sys</code> suffix.</p>
+two crates, one called <code class="language-plaintext highlighter-rouge">*-sys</code> (replacing <code class="language-plaintext highlighter-rouge">*</code> with the name of the original API you’re
+binding to), and the other without the <code class="language-plaintext highlighter-rouge">*-sys</code> suffix.</p>
 
 <p>This second step, of writing the idiomatic bindings, can be hard! If you’ve used Rust
 much, you’ve probably noticed that Rust’s rules that all data has one owner, and
@@ -404,13 +408,13 @@ over FFI, so choosing outbound FFI may mean choosing type representations which 
 natural on the Rust side, but which make the work of exposing the crate to other languages
 easier.</p>
 
-<p>The tool <a href="https://github.com/eqrion/cbindgen"><code class="highlighter-rouge">cbindgen</code></a> is a popular choice for generating C bindings for Rust
-code (the outbound FFI version of <code class="highlighter-rouge">bindgen</code>), and notes what kinds of types it can
+<p>The tool <a href="https://github.com/eqrion/cbindgen"><code class="language-plaintext highlighter-rouge">cbindgen</code></a> is a popular choice for generating C bindings for Rust
+code (the outbound FFI version of <code class="language-plaintext highlighter-rouge">bindgen</code>), and notes what kinds of types it can
 directly generated C-equivalents for in the <a href="https://github.com/eqrion/cbindgen/blob/master/docs.md#supported-types">“Supported Types”</a> section of its
 documentation.</p>
 
 <p>Invasive outbound FFI is an approach that tries to ensure internal Rust types fit the
-rules of what <code class="highlighter-rouge">cbindgen</code> can generate bindings for.</p>
+rules of what <code class="language-plaintext highlighter-rouge">cbindgen</code> can generate bindings for.</p>
 
 <h3 id="non-invasive-outbound-ffi">Non-Invasive Outbound FFI</h3>
 
@@ -420,8 +424,8 @@ across the FFI boundary, instead exposing <em>opaque pointers</em>, meaning poin
 types where the external language knows the name of the type, but nothing about its
 contents.</p>
 
-<p>With <code class="highlighter-rouge">cbindgen</code>, you can get this type representation as output by having a type which
-is public, but not <code class="highlighter-rouge">#[repr(C)]</code>, meaning it’s not guaranteed to have a layout C can
+<p>With <code class="language-plaintext highlighter-rouge">cbindgen</code>, you can get this type representation as output by having a type which
+is public, but not <code class="language-plaintext highlighter-rouge">#[repr(C)]</code>, meaning it’s not guaranteed to have a layout C can
 understand.</p>
 
 <p>Since the outside language knows nothing about your type, including its fields, a
@@ -430,7 +434,7 @@ iterating, and other operations the outside language might want to do.</p>
 
 <p>To avoid dangling pointers, this approach also means you’ll need to put your opaque Rust
 types on the heap and then leak the pointer (transferring ownership to
-the outside language) via <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.into_raw"><code class="highlighter-rouge">Box::into_raw</code></a>. This heap allocation may be
+the outside language) via <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.into_raw"><code class="language-plaintext highlighter-rouge">Box::into_raw</code></a>. This heap allocation may be
 undesirable in certain contexts, so as always, choosing between invasive and non-invasive
 designs involves trade-offs.</p>
 

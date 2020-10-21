@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Enum or Trait Object" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/enum-or-trait-object"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/guide/enum-or-trait-object","description":"Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.","headline":"Enum or Trait Object","dateModified":"2020-07-27T17:53:00-07:00","datePublished":"2020-07-27T17:53:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"dateModified":"2020-07-27T17:53:00-07:00","datePublished":"2020-07-27T17:53:00-07:00","headline":"Enum or Trait Object","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/enum-or-trait-object"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"description":"Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.","url":"https://www.possiblerust.com/guide/enum-or-trait-object","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -231,6 +231,10 @@
                     <a class="plain" href="/tags#opinion">#opinion<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#generics">#generics<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -411,8 +415,8 @@ the location of the appropriate instructions to execute.</p>
 <p>The advantage with trait objects is that users can define their own types which implement the
 trait, and can then be used wherever a trait object is expected.</p>
 
-<p>Note as well that trait objects may be represented as <code class="highlighter-rouge">Box&lt;dyn Trait&gt;</code> (an owned trait object), or
-as <code class="highlighter-rouge">&amp;dyn Trait</code> or <code class="highlighter-rouge">&amp;mut dyn Trait</code> (borrowed trait objects). In either case, they represent an
+<p>Note as well that trait objects may be represented as <code class="language-plaintext highlighter-rouge">Box&lt;dyn Trait&gt;</code> (an owned trait object), or
+as <code class="language-plaintext highlighter-rouge">&amp;dyn Trait</code> or <code class="language-plaintext highlighter-rouge">&amp;mut dyn Trait</code> (borrowed trait objects). In either case, they represent an
 open set of types which uses dynamic dispatch for method execution.</p>
 
 <aside id="aside-2">

@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.6.1 -->
-<meta name="generator" content="Jekyll v4.0.0" />
+<meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Rust Lints You May Not Know" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know","description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","headline":"Rust Lints You May Not Know","dateModified":"2020-06-21T15:59:00-07:00","datePublished":"2020-06-21T15:59:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"dateModified":"2020-06-21T15:59:00-07:00","datePublished":"2020-06-21T15:59:00-07:00","headline":"Rust Lints You May Not Know","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","url":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -231,6 +231,10 @@
                     <a class="plain" href="/tags#opinion">#opinion<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#generics">#generics<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -288,7 +292,7 @@ Feed</a>
         <p>The Rust compiler ships with a number of useful lints on by default,
 and many use Clippy to provide additional lints. It’s less well known
 that the Rust compiler ships with some useful lints which are set to
-<code class="highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
+<code class="language-plaintext highlighter-rouge">allow</code> by default, meaning they don’t generate warnings. In this post,
 I’ll explain what each of these lints does, and why it might be useful.</p>
 
 <!-- more -->
@@ -313,20 +317,20 @@ in header files. However, it was considered poor style, and support for it was
 removed with Rust 2018.</p>
 
 <p>Resolving this lint is easy. If you don’t want to have to name the parameters, you can
-use the name <code class="highlighter-rouge">_</code>, which is Rust’s standard name for ignoring values. However, the
+use the name <code class="language-plaintext highlighter-rouge">_</code>, which is Rust’s standard name for ignoring values. However, the
 purpose of this lint is to encourage you to provide useful, meaningful names for the
 parameters.</p>
 
 <h3 id="box-pointers">Box Pointers</h3>
 
 <p>Before Rust offered a mechanism to change the default allocator, one had to implement
-their own version of <code class="highlighter-rouge">Box</code> which used a different underying allocator. In that situation,
-it was desirable for the compiler to flag if you still used the standard <code class="highlighter-rouge">Box</code> type, as
+their own version of <code class="language-plaintext highlighter-rouge">Box</code> which used a different underying allocator. In that situation,
+it was desirable for the compiler to flag if you still used the standard <code class="language-plaintext highlighter-rouge">Box</code> type, as
 that would <em>not</em> use the custom allocator you intended.</p>
 
 <p>Today, Rust programs can freely change the default allocator, removing the common need
 for this lint. Otherwise, it’s useful if you wish to disallow heap allocation, although
-there remain other types (like <code class="highlighter-rouge">Vec</code>) which allocate data on the heap, so this lint would
+there remain other types (like <code class="language-plaintext highlighter-rouge">Vec</code>) which allocate data on the heap, so this lint would
 be useful, but not sufficient, for ensuring no heap allocations occur.</p>
 
 <h3 id="elided-lifetime-in-path">Elided Lifetime in Path</h3>
@@ -351,24 +355,24 @@ its application is a matter of taste.</p>
 <aside id="aside-1">
     <h4>Aside #1: When to Implement <code>Copy</code> <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
     
-<p>You may also consider the performance implications of implementing <code class="highlighter-rouge">Copy</code>, which by
-definition is implemented as a <code class="highlighter-rouge">memcpy</code> of the bytes containing the type. If the size
-of the type is larger than the size of a pointer on the host architecture (a <code class="highlighter-rouge">usize</code>),
+<p>You may also consider the performance implications of implementing <code class="language-plaintext highlighter-rouge">Copy</code>, which by
+definition is implemented as a <code class="language-plaintext highlighter-rouge">memcpy</code> of the bytes containing the type. If the size
+of the type is larger than the size of a pointer on the host architecture (a <code class="language-plaintext highlighter-rouge">usize</code>),
 then the cost of copying the type will be higher than the cost of copying a pointer to
 the type (which is what’s passed when working with references).</p>
 
 </aside>
 
-<p>In general, it is considered good Rust practice to implement common traits like <code class="highlighter-rouge">Copy</code>
+<p>In general, it is considered good Rust practice to implement common traits like <code class="language-plaintext highlighter-rouge">Copy</code>
 for types which are able to implement them. This recommendation is enshrined in the
 Rust API guidelines, and is intended to make types provided by Rust crates usable
 in as wide a variety of contexts as possible.</p>
 
-<p>This lint helps make sure you don’t forget to implement <code class="highlighter-rouge">Copy</code>, one of the simpler
+<p>This lint helps make sure you don’t forget to implement <code class="language-plaintext highlighter-rouge">Copy</code>, one of the simpler
 and more useful common traits, when possible.</p>
 
 <p>However, there are a couple important notes to make. First, there are types which
-one may <em>not</em> want to implement <code class="highlighter-rouge">Copy</code> for. For example, a type which is designed
+one may <em>not</em> want to implement <code class="language-plaintext highlighter-rouge">Copy</code> for. For example, a type which is designed
 to generate monotonically increasing ID numbers probably should not be copied,
 lest you end up with two generators generating duplicate IDs. Second, there is a
 cost in compile times for generating trait implementations, and so removing
@@ -377,46 +381,46 @@ excess trait impls may be desirable for reducing the compilation time of a crate
 <aside id="aside-2">
     <h4>Aside #2: The <code>Copy</code> Restriction <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
     
-<p>When you implement <code class="highlighter-rouge">Copy</code> for a type, you place a restriction on future changes to
-that type. <code class="highlighter-rouge">Copy</code> may only be implemented for types without interior pointers, so
-implementing <code class="highlighter-rouge">Copy</code> in a public API is a promise the type will not contain pointers
+<p>When you implement <code class="language-plaintext highlighter-rouge">Copy</code> for a type, you place a restriction on future changes to
+that type. <code class="language-plaintext highlighter-rouge">Copy</code> may only be implemented for types without interior pointers, so
+implementing <code class="language-plaintext highlighter-rouge">Copy</code> in a public API is a promise the type will not contain pointers
 in the future. Removing a trait is always a breaking change, so be aware of the
-commitment you’re making when implementing <code class="highlighter-rouge">Copy</code> for a public type.</p>
+commitment you’re making when implementing <code class="language-plaintext highlighter-rouge">Copy</code> for a public type.</p>
 
 </aside>
 
 <p>In cases where a particular type ought not to be copied, or where the cost of deriving
 excess traits is too high, you may assign an item attribute which selectively sets this
-lint to <code class="highlighter-rouge">allow</code>. Ideally, this would be accompanied by a comment explaining the
+lint to <code class="language-plaintext highlighter-rouge">allow</code>. Ideally, this would be accompanied by a comment explaining the
 reasoning behind the exception.</p>
 
 <h3 id="missing-debug-implementations">Missing Debug Implementations</h3>
 
-<p>The same that could be said for the last lint may be said about this one. <code class="highlighter-rouge">Debug</code>
+<p>The same that could be said for the last lint may be said about this one. <code class="language-plaintext highlighter-rouge">Debug</code>
 is a common and useful trait that may, as the name suggests, be used to debug
 Rust programs by viewing the internals of the types for which it is implemented.</p>
 
 <aside id="aside-3">
     <h4>Aside #3: <code>Debug</code> for Secrets <a href="#aside-3" class="aside-link"><span>↺</span></a></h4>
     
-<p>Another option when dealing with <code class="highlighter-rouge">Debug</code> for secret data is to implement it manually
+<p>Another option when dealing with <code class="language-plaintext highlighter-rouge">Debug</code> for secret data is to implement it manually
 in a manner that doesn’t print the secret. That way it doesn’t interfere with types
-which contain it and want to implement <code class="highlighter-rouge">Debug</code>, but also avoids the risk of accidental
+which contain it and want to implement <code class="language-plaintext highlighter-rouge">Debug</code>, but also avoids the risk of accidental
 disclosure.</p>
 
 </aside>
 
-<p>However, there are some types which ought <em>not</em> to implement <code class="highlighter-rouge">Debug</code>, the most
+<p>However, there are some types which ought <em>not</em> to implement <code class="language-plaintext highlighter-rouge">Debug</code>, the most
 notable of which are any types which contain secret data. If a type representing
-a cryptographic key implements <code class="highlighter-rouge">Debug</code>, it may end up accidentally being printed
+a cryptographic key implements <code class="language-plaintext highlighter-rouge">Debug</code>, it may end up accidentally being printed
 to a log or some other location, where an attacker may be able to read it.</p>
 
-<p><code class="highlighter-rouge">Debug</code>, same as <code class="highlighter-rouge">Copy</code>, also comes with a compilation-time cost which may not
+<p><code class="language-plaintext highlighter-rouge">Debug</code>, same as <code class="language-plaintext highlighter-rouge">Copy</code>, also comes with a compilation-time cost which may not
 be desirable. This tradeoff ought to be assessed contextually.</p>
 
 <h3 id="missing-docs">Missing Docs</h3>
 
-<p>Rust makes it easy to create API documentation using the <code class="highlighter-rouge">rustdoc</code> tool, and
+<p>Rust makes it easy to create API documentation using the <code class="language-plaintext highlighter-rouge">rustdoc</code> tool, and
 ideally all publicly-exposed parts of a crate’s API will receive some degree of
 documentation. This lint helps ensure that, although it says nothing about the
 <em>quality</em> of the documentation provided.</p>
@@ -456,8 +460,8 @@ flagged by this lint.</p>
         <div class="box-content">
             
 <p>Clippy offers a useful lint called <a href="https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless “Documentation for the cast_lossless Clippy lint”">“cast lossless”</a>,
-which flags uses of <code class="highlighter-rouge">as</code>-conversions which could be replaced by generally
-clearer and safer <code class="highlighter-rouge">Into</code>/<code class="highlighter-rouge">From</code>-conversions which, unlike <code class="highlighter-rouge">as</code>-conversions,
+which flags uses of <code class="language-plaintext highlighter-rouge">as</code>-conversions which could be replaced by generally
+clearer and safer <code class="language-plaintext highlighter-rouge">Into</code>/<code class="language-plaintext highlighter-rouge">From</code>-conversions which, unlike <code class="language-plaintext highlighter-rouge">as</code>-conversions,
 are guaranteed to be lossless.</p>
 
 
@@ -467,7 +471,7 @@ are guaranteed to be lossless.</p>
 
 <h3 id="unreachable-pub">Unreachable Pub</h3>
 
-<p>The use of <code class="highlighter-rouge">pub</code> in Rust is to declare an item as public, but if the item’s
+<p>The use of <code class="language-plaintext highlighter-rouge">pub</code> in Rust is to declare an item as public, but if the item’s
 containing module is private, the item will itself be private, regardless
 of the visibility specified on it directly. This lint helps to catch these
 cases, which left unchecked may lead to confusion about visibility when
