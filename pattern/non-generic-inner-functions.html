@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.7.1 -->
-<meta name="generator" content="Jekyll v4.1.1" />
+<meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Non-Generic Inner Functions" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"Non-Generic Inner Functions","dateModified":"2020-10-20T18:19:00-07:00","datePublished":"2020-10-20T18:19:00-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/non-generic-inner-functions"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/pattern/non-generic-inner-functions","description":"Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/non-generic-inner-functions"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"Non-Generic Inner Functions","url":"https://www.possiblerust.com/pattern/non-generic-inner-functions","datePublished":"2020-10-20T18:19:00-07:00","description":"Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future.","dateModified":"2020-10-20T18:19:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -235,6 +235,10 @@
                     <a class="plain" href="/tags#generics">#generics<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#functions">#functions<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -278,11 +282,13 @@ Feed</a>
                 <div class="site-content">
                             
                         <h2 class="site-title">Non-Generic Inner Functions</h2>
-                        <p class="post-preview-meta">
-                            Oct 20th, 2020
+                        
+                            <p class="post-preview-meta">
+                                Oct 20th, 2020
  &middot;  <a href="/pattern" class="meta">Pattern</a>  
  &middot;  <a href="/tags#generics" class="meta">#generics</a>  
-                        </p>
+                            </p>
+                        
                     
 
                     <div class="post " role="main">
@@ -300,7 +306,8 @@ the future.</p>
 
 <p>The snippet Steve showed is this one:</p>
 
-<figure class="figure--code " id="code-1">
+<figure class="figure--code  " id="code-1">
+    <a class="visually-hidden" href="#skip-code-1">Skip this content.</a>
     
 <div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Taken from https://steveklabnik.com/writing/are-out-parameters-idiomatic-in-rust</span>
 <span class="k">pub</span> <span class="k">fn</span> <span class="n">read_to_string</span><span class="o">&lt;</span><span class="n">P</span><span class="p">:</span> <span class="n">AsRef</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">P</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nn">io</span><span class="p">::</span><span class="n">Result</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="p">{</span>
@@ -314,7 +321,8 @@ the future.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-    <figcaption><span>Code 1</span> The example code from Steve's post. <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 1</span> <p>The example code from Steve’s post.</p> <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-1"></div>
 </figure>
 
 <p>Notice that the outer function is generic, taking anything which is convertible via
@@ -334,7 +342,8 @@ to use).</p>
 
 <p>We can imagine this monomorphization looks like this:</p>
 
-<figure class="figure--code " id="code-2">
+<figure class="figure--code  " id="code-2">
+    <a class="visually-hidden" href="#skip-code-2">Skip this content.</a>
     
 <div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">path</span><span class="p">::{</span><span class="n">Path</span><span class="p">,</span> <span class="n">PathBuf</span><span class="p">};</span>
 <span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">error</span><span class="p">::</span><span class="n">Error</span> <span class="k">as</span> <span class="n">StdError</span><span class="p">;</span>
@@ -423,7 +432,8 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 */</span>
 </code></pre></div></div>
 
-    <figcaption><span>Code 2</span> An example of what monomorphization looks like. <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 2</span> <p>An example of what monomorphization looks like.</p> <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-2"></div>
 </figure>
 
 <p>While the generated code doesn’t look too different from the original code, consider that some generic functions
@@ -439,13 +449,14 @@ meaning you may end up with a lot of repeated code in a binary, one for each ver
 the resulting executable file.</p>
 
 <aside id="aside-1">
-    <h4>Aside #1: Dynamic Dispatch <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
+    <h4><span class="aside-num">Aside 1:</span> <span class="aside-title">Dynamic Dispatch</span> <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
+    <a class="visually-hidden" href="#skip-aside-1">Skip this content.</a>
     
 <p>Another option to avoid bloating the binary is to perform dynamic dispatch via trait objects. With dynamic dispatch,
 the determination of what concrete implementation of a generic function to call is performed at run-time, by
 inspecting a table mapping types to function, which is stored alongside the data pointer in the trait object
 structure, often called a “fat pointer.”</p>
-
+    <div id="skip-aside-1"></div>
 </aside>
 
 <p>However, the ability to be generic and reusable is valuable, and taking in types like <code class="language-plaintext highlighter-rouge">AsRef&lt;Path&gt;</code> is often in
@@ -462,7 +473,8 @@ resulting binary are both reduced.</p>
 
 <p>You could do this pattern with a function outside of the original like so:</p>
 
-<figure class="figure--code " id="code-3">
+<figure class="figure--code  " id="code-3">
+    <a class="visually-hidden" href="#skip-code-3">Skip this content.</a>
     
 <div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Adapted from https://steveklabnik.com/writing/are-out-parameters-idiomatic-in-rust</span>
 <span class="k">pub</span> <span class="k">fn</span> <span class="n">read_to_string</span><span class="o">&lt;</span><span class="n">P</span><span class="p">:</span> <span class="n">AsRef</span><span class="o">&lt;</span><span class="n">Path</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">P</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nn">io</span><span class="p">::</span><span class="n">Result</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="p">{</span>
@@ -477,7 +489,8 @@ resulting binary are both reduced.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-    <figcaption><span>Code 3</span> An example showing the inner function placed outside the original generic function. <a href="#code-3" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 3</span> <p>An example showing the inner function placed outside the original generic function.</p> <a href="#code-3" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-3"></div>
 </figure>
 
 <p>However, this does pollute the namespace with a function which will only ever have one caller. The one question
@@ -488,7 +501,8 @@ function, doesn’t it still contribute to code bloat?</p>
 Mid-level Internal Representation, which is converted into LLVM IR and then into machine code). The MIR for
 <code class="language-plaintext highlighter-rouge">read_to_string</code> in the above full code example looks like this:</p>
 
-<figure class="figure--code " id="code-4">
+<figure class="figure--code  " id="code-4">
+    <a class="visually-hidden" href="#skip-code-4">Skip this content.</a>
     
 <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fn read_to_string(_1: P) -&gt; std::result::Result&lt;std::string::String, std::io::Error&gt; {
     debug path =&gt; _1;                    // in scope 0 at src/main.rs:17:39: 17:43
@@ -537,7 +551,8 @@ Mid-level Internal Representation, which is converted into LLVM IR and then into
 }
 </code></pre></div></div>
 
-    <figcaption><span>Code 4</span> A snippet of MIR showing the generic function is smaller with the non-generic inner function pattern. <a href="#code-4" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 4</span> <p>A snippet of MIR showing the generic function is smaller with the non-generic inner function pattern.</p> <a href="#code-4" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-4"></div>
 </figure>
 
 <p>This is a generated textual representation of MIR’s internal structure, so it may be a bit hard to read, but
@@ -609,7 +624,10 @@ without causing any problems.</li>
 
     <div class="other-posts">
         
-            <div></div>
+            <a href="/guide/how-to-read-rust-functions-part-1">
+                <span>Newer Post</span>
+                <h4>How to Read Rust Functions, Part 1</h4>
+            </a>
         
 
         

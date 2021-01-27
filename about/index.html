@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.7.1 -->
-<meta name="generator" content="Jekyll v4.1.1" />
+<meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="About" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -37,7 +37,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"About","sameAs":["https://twitter.com/PossibleRust"],"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/about/","description":"Learning what’s possible in Rust.","@type":"WebSite","name":"PossibleRust","@context":"https://schema.org"}</script>
+{"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"About","url":"https://www.possiblerust.com/about/","description":"Learning what’s possible in Rust.","@type":"WebSite","sameAs":["https://twitter.com/PossibleRust"],"name":"PossibleRust","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -233,6 +233,10 @@
                     <a class="plain" href="/tags#generics">#generics<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#functions">#functions<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -276,20 +280,78 @@ Feed</a>
                 <div class="site-content">
                             
                         <h2 class="site-title">About</h2>
-                        <p class="post-preview-meta">
-                            
-
-
-                        </p>
+                        
+                            <br>
+                        
                     
 
                     <h3 id="about-the-site">About the Site</h3>
 
-<p>Possible Rust is a blog about the Rust programming language; what you can do with it, how to use it effectively, where the language is going, what’s in the ecosystem, and a million other things. More than any of that, it’s an opportunity to share what I have learned and am still learning about Rust!</p>
+<p>Possible Rust is a blog about the Rust programming language.</p>
 
-<p>If you’re learning Rust for the first time, or are interesting in learning Rust, or you’ve been using it for a while but are curious to know more, this blog is for you! If you have questions about the language, please feel free to ask them on Twitter <a href="https://twitter.com/possiblerust">@PossibleRust</a>, either publicly or via direct message (my DM’s are open).</p>
+<p>Specifically, it’s a blog for <em>intermediate</em> Rust programmers; people who’ve maybe finished
+the official <a href="https://doc.rust-lang.org/book/">Rust book</a>, and are looking to better understand how to use Rust in the
+real world, what the patterns are that they might encounter or what to use, or how to read
+other people’s Rust code.</p>
 
-<p>It’s also intended to be accessible. This is a best-effort commitment with the resources I have available. If you identify an accessibility problem please let me know so I can try to resolve it.</p>
+<p>If that’s not you, that’s alright! I highly recommend starting with some of the official
+recommended learning materials, including the Rust book, the <a href="https://github.com/rust-lang/rustlings/">Rustlings</a> exercise
+set, or anything else <a href="https://www.rust-lang.org/learn">linked from the official website</a>. A lot of work goes into making
+those materials clear, useful, and organized in a logical progression to effectively teach
+the language.</p>
+
+<p>I also recommend, at any stage of Rust knowledge, that you read the error messages the
+compiler gives you. The Rust compiler is <em>very</em> good, and usually gives clear, useful
+error messages that help guide you from broken code to code that not only compiles, but
+works correctly.</p>
+
+<p>If you’re at the point where Possible Rust can help, it’s useful to understand a bit
+of how it’s structured. The site’s posts are organized into five categories:</p>
+
+<ul>
+  <li><strong>Guides</strong>: These are walk-throughs of some concepts in Rust’s semantics or its
+common usage, intended to help build understanding of how Rust works, and how to
+write Rust successfully.</li>
+  <li><strong>Patterns</strong>: These are descriptions of real-world programming patterns you may see
+in Rust code, as well as tips for improving your Rust programming.</li>
+  <li><strong>Unpacking</strong> (Coming Soon): This category will feature deep dives into popular Rust
+crates, to identify useful tricks and patterns in them that can be applied to your
+own code, and to understand how other Rust programmers approach the language and use
+its guarantees and affordances to produce highly-quality tools and libraries.</li>
+  <li><strong>Community</strong>: These are discussions of the Rust community, including useful external
+resources, topics currently under discussion, or opinions on how Rust may evolve in
+the future.</li>
+  <li><strong>Meta</strong>: These are posts about the site itself.</li>
+</ul>
+
+<p>Additionally, posts are tagged according to the major language features or concepts they
+address. You can view them all on the <a href="/tags">tags page</a>.</p>
+
+<p>The full list of past posts can be found on the <a href="/archive">archive page</a>. This is likely
+easier to navigate than scrolling through pages of past posts.</p>
+
+<p>Finally, while the site doesn’t incorporate searching directly, you can limit search
+results in your preferred search engine to include only the Possible Rust site. My
+preferred method is with <a href="https://duckduckgo.com/?q=site%3Apossiblerust.com">DuckDuckGo</a>.</p>
+
+<p>Outside of the site, all posts are shared to the site’s <a href="https://twitter.com/PossibleRust">Twitter account</a>, which
+may also periodically feature other posts including Rust Q&amp;A sessions, or links to
+other interesting or useful Rust material. These posts will always be tagged so you can
+filter them out if you’re uninterested in seeing them.</p>
+
+<p>You can also subscribe to Possible Rust via an <a href="/feed.xml">Atom/RSS feed</a>. Due to limitations
+in exposing the full formatting and extra features (including asides, tables, and figure
+blocks), the feed does not include full post contents. However, the site itself is
+designed to load extremely quickly, and includes no analytics tracking beyond what’s
+performed by GitHub Pages (IP address and what page is requested, at minimum). In fact,
+Possible Rust currently includes <em>no JavaScript</em> at all, and receives a perfect
+100 out of 100 score for both mobile and desktop from Google PageSpeed Insights.</p>
+
+<p>The site is also intended to be fully accessible for all users. This includes periodic
+testing for color contrast and keyboard navigation. I am always looking to do better,
+and if you encounter a usability challenge, please let me know via a Direct Message to
+the Possible Rust <a href="https://twitter.com/PossibleRust">Twitter account</a>, or by sending an email to
+<strong>possiblerust at gmail</strong>.</p>
 
 <h3 id="about-andrew">About Andrew</h3>
 
@@ -297,16 +359,46 @@ Feed</a>
     <img class="right" src="/assets/img/me.jpg" alt="A picture of Andrew Lilley Brinker" />
 </div>
 
-<p>Hi there, my name is Andrew, and I’ve been writing Rust since version 0.8 in 2013. At the time I was a junior in college, now I work professionally on software security at <a href="https://mitre.org" title="MITRE: Solving Problems for a Safer World">MITRE</a>. I’ve written Rust every year since, and I’m still learning all the time!</p>
+<p>My name is Andrew Lilley Brinker (“Lilley Brinker” is my last name), and I’ve been writing
+Rust since 2013. My main focus in the Rust community is on teaching and
+mentoring. I’ve contributed to a few pieces of official Rust documentation, including the
+now-defunct Frequently Asked Questions page and a small portion of the Rustomicon. Elsewhere,
+I’ve taught formal and informal Rust training at <a href="https://mitre.org">MITRE</a> (where I work), provided
+<a href="https://rustbeginners.github.io/awesome-rust-mentors/#andrew-lilley-brinker-alilleybrinker">mentoring to new Rustaceans</a>, taught Rust to undergraduates learning programming
+language theory, and now I write this blog!</p>
 
-<p>Some things I’ve gotten to do:</p>
+<p>Outside of teaching Rust, I work in software security, building safer and more secure
+programming languages, working with static and dynamic code analysis, exploring formal methods
+for proving things about software, and investigating software supply chain risk management.
+I’m also a manager, and love to mentor and support those I work with, especially newer
+professionals, in achieving their career aspirations.</p>
+
+<p>You can find my two prior Rust talks on YouTube:</p>
 
 <ul>
-  <li>Teach Rust as part of an undergraduate programming language theory course.</li>
-  <li>Speak at Rust Belt Rust 2016 with a talk titled “Hello and Welcome: Documentation in the Rust Ecosystem.”</li>
-  <li>Speak at Rust Conf 2017 with a talk titled “A Tale of Teaching Rust.”</li>
-  <li>Write the (now defunct) Rust Frequently Asked Questions page.</li>
-  <li>Teach Rust for MITRE’s internal corporate education program.</li>
+  <li><a href="https://www.youtube.com/watch?v=Wz2oFEDwiOk">“Hello and Welcome: Documentation in the Rust Ecosystem”</a> from Rust Belt Rust 2016.
+This talk describes a way of thinking about documentation in four parts. I still believe this
+is a useful conceptual model for creating documentation, and that Rust makes producing good
+documentation, particularly good reference material, easier than many other languages do!
+The four parts in question are:
+    <ol>
+      <li><em>The Meet Cute</em>: This is the documentation that first introduces you to something, and
+convinces you it’s worth exploring further.</li>
+      <li><em>The Black Triangle</em>: This is the minimal example of a project showing it doing something
+cool or worthwhile, and shows <em>how</em> that thing is done, to illustrate its value clearly.</li>
+      <li><em>The Walkthrough</em>: This is the guided tour through a project, showing its core concepts
+and components.</li>
+      <li><em>The Reference</em>: This is the complete documentation of all parts of the project.</li>
+    </ol>
+  </li>
+  <li><a href="https://www.youtube.com/watch?v=0PhfaFkzdBA">“A Tale of Teaching Rust”</a> from RustConf 2017. This is a talk about how I included
+Rust in an undergraduate programming language theory course, including why I included Rust
+in the course, what I set out to teach using Rust, and how successful the effort was. More
+than anything, this talk was intended to push back against the notion that Rust can’t be
+taught effectively and quickly, by showing that in a manner of a few weeks of a single
+university course, students with minimal programming knowledge were able to understand and
+write basic Rust code, and understood Rust’s particular value proposition, and how it
+differed or was similar to other languages covered in the course.</li>
 </ul>
 
 

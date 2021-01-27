@@ -23,7 +23,7 @@
         <meta name="theme-color" content="#e4edf6">
 
         <!-- Begin Jekyll SEO tag v2.7.1 -->
-<meta name="generator" content="Jekyll v4.1.1" />
+<meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Enum or Trait Object" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"Enum or Trait Object","dateModified":"2020-07-27T17:53:00-07:00","datePublished":"2020-07-27T17:53:00-07:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/enum-or-trait-object"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/guide/enum-or-trait-object","description":"Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/enum-or-trait-object"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"Enum or Trait Object","url":"https://www.possiblerust.com/guide/enum-or-trait-object","datePublished":"2020-07-27T17:53:00-07:00","description":"Rust has two major mechanisms for delegating logic: enums and trait objects, and it may be unclear when to use one or the other. In this post, I will walk through how each works, what the tradeoffs are, and how to choose the right option for your code.","dateModified":"2020-07-27T17:53:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -235,6 +235,10 @@
                     <a class="plain" href="/tags#generics">#generics<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#functions">#functions<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -278,11 +282,13 @@ Feed</a>
                 <div class="site-content">
                             
                         <h2 class="site-title">Enum or Trait Object</h2>
-                        <p class="post-preview-meta">
-                            Jul 27th, 2020
+                        
+                            <p class="post-preview-meta">
+                                Jul 27th, 2020
  &middot;  <a href="/guide" class="meta">Guide</a>  
  &middot;  <a href="/tags#enums" class="meta">#enums</a>,  <a href="/tags#trait-objects" class="meta">#trait objects</a>  
-                        </p>
+                            </p>
+                        
                     
 
                     <div class="post " role="main">
@@ -302,7 +308,8 @@ right option for your code.</p>
 each possibility containing some addition data. Enums are one of Rust’s core data
 types, can look like any of the following, as examples:</p>
 
-<figure class="figure--code " id="code-1">
+<figure class="figure--code  " id="code-1">
+    <a class="visually-hidden" href="#skip-code-1">Skip this content.</a>
     
 <div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">enum</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
     <span class="nf">Some</span><span class="p">(</span><span class="n">T</span><span class="p">),</span>
@@ -320,7 +327,8 @@ types, can look like any of the following, as examples:</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-    <figcaption><span>Code 1</span> A collection of example enums <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 1</span> <p>A collection of example enums</p> <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-1"></div>
 </figure>
 
 <p>Note that enums are, by their nature, a <strong>closed set of types</strong>. You define a finite
@@ -330,7 +338,8 @@ call sites / users of the enum to handle the additional variant), but users of y
 type can’t add additional variants themselves.</p>
 
 <aside id="aside-1">
-    <h4>Aside #1: Non-exhaustive Enums <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
+    <h4><span class="aside-num">Aside 1:</span> <span class="aside-title">Non-exhaustive Enums</span> <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
+    <a class="visually-hidden" href="#skip-aside-1">Skip this content.</a>
     
 <p>Enums may be marked <a href="https://doc.rust-lang.org/reference/attributes/type_system.html#the-non_exhaustive-attribute">“non-exhaustive”</a> to force users of the crate in which the type is
 defined to include a catch-all match pattern, enabling the addition of future variants
@@ -339,7 +348,7 @@ to the enum without breaking compatibility for users.</p>
 <p>Note that users of the enum within the current crate are not affected by the “non-exhaustive”
 annotation.</p>
 
-
+    <div id="skip-aside-1"></div>
 </aside>
 
 <p>The advantage of enums is that they are fast. Because the total list of variants is known
@@ -351,7 +360,8 @@ a branch instruction.</p>
 <p><em>Trait Objects</em> allow for the uniform treatment of different concrete types which all
 implement the same trait, like so:</p>
 
-<figure class="figure--code " id="code-2">
+<figure class="figure--code  " id="code-2">
+    <a class="visually-hidden" href="#skip-code-2">Skip this content.</a>
     
 <div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">f64</span><span class="p">::</span><span class="nn">consts</span><span class="p">::</span><span class="n">PI</span><span class="p">;</span>
 
@@ -402,7 +412,8 @@ implement the same trait, like so:</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-    <figcaption><span>Code 2</span>  <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+    <figcaption><span class="figure-opener">Code 2</span>  <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-2"></div>
 </figure>
 
 <p>By contrast, a trait object is an <strong>open set of types</strong>. Trait objects are Rust’s key
@@ -420,19 +431,21 @@ as <code class="language-plaintext highlighter-rouge">&amp;dyn Trait</code> or <
 open set of types which uses dynamic dispatch for method execution.</p>
 
 <aside id="aside-2">
-    <h4>Aside #2: Object Safety <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
+    <h4><span class="aside-num">Aside 2:</span> <span class="aside-title">Object Safety</span> <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
+    <a class="visually-hidden" href="#skip-aside-2">Skip this content.</a>
     
 <p>Not all traits may be used to construct trait objects. The requirement for making a trait
 object is that the trait be “object safe.” The official book “The Rust Programming Language”
 <a href="https://doc.rust-lang.org/book/ch17-02-trait-objects.html#object-safety-is-required-for-trait-objects">explains object safety in Chapter 17</a>.</p>
 
-
+    <div id="skip-aside-2"></div>
 </aside>
 
 <h2 id="summarizing-trade-offs">Summarizing Trade-Offs</h2>
 
 <figure class="figure--table " id="table-1">
-    <figcaption><span>Table 1</span> Summary of trade-offs between enums and trait objects <a href="#table-1" class="figure-link"><span>↺</span></a></figcaption>
+    <a class="visually-hidden" href="#skip-table-1">Skip this content.</a>
+    <figcaption><span>Table 1</span> <p>Summary of trade-offs between enums and trait objects</p> <a href="#table-1" class="figure-link"><span>↺</span></a></figcaption>
     
 <table>
   <thead>
@@ -460,6 +473,7 @@ object is that the trait be “object safe.” The official book “The Rust Pro
 </table>
 
 
+    <div id="skip-table-1"></div>
 </figure>
 
 <h2 id="when-to-use-them">When to Use Them?</h2>
