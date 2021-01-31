@@ -462,7 +462,7 @@ By contrast, <dfn id="dfn-refutable">refutable</dfn> patterns may sometimes fail
 perhaps because they specify only a single variant of an <code class="language-plaintext highlighter-rouge">enum</code> with multiple variants.
 Refutable patterns can be used in a <code class="language-plaintext highlighter-rouge">match</code> expression or equivalent construct, where the
 collection of patterns is checked for exhaustiveness (meaning all values are guaranteed to
-match at least pattern), but patterns in function signatures are all alone, so they must
+match at least one pattern), but patterns in function signatures are all alone, so they must
 be irrefutable.</p>
 
 <aside id="aside-2">
@@ -743,7 +743,8 @@ from the start as well. In that case, you can use a mutable owning binding.</p>
 <figure class="figure--code  " id="code-5">
     <a class="visually-hidden" href="#skip-code-5">Skip this content.</a>
     
-<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="nf">Number</span><span class="p">(</span><span class="nb">i32</span><span class="p">);</span>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[derive(Copy,</span> <span class="nd">Clone)]</span>
+<span class="k">struct</span> <span class="nf">Number</span><span class="p">(</span><span class="nb">i32</span><span class="p">);</span>
 
 <span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">let</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">Number</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
@@ -966,7 +967,7 @@ Rust language ecosystem.</p>
     <span class="c">// However, this _doesn't_ work, but for a distinct reason.</span>
     <span class="c">// `&amp;mut 8` is a temporary value which stops existing when</span>
     <span class="c">// the function ends, and for a mutable reference (unlike</span>
-    <span class="c">// a mutable reference), the value needs to exist past the</span>
+    <span class="c">// an immutable reference), the value needs to exist past the</span>
     <span class="c">// end of the function, in the calling context. That's not</span>
     <span class="c">// possible for a temporary value, so this would fail to</span>
     <span class="c">// compile.</span>
