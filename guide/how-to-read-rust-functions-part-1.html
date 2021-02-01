@@ -1066,7 +1066,7 @@ This is what makes smart pointers easy to use in place of the original type!</p>
 
 <p>However, because of deref coercion, defining methods on the smart pointer may make it difficult to call
 any methods on the contained type which have the same name. To avoid this collision, methods on smart
-pointer types are often defined as associated functioins instead. The <code class="language-plaintext highlighter-rouge">Rc</code> type has multiple examples of this,
+pointer types are often defined as associated functions instead. The <code class="language-plaintext highlighter-rouge">Rc</code> type has multiple examples of this,
 with functions like <a href="https://doc.rust-lang.org/std/rc/struct.Rc.html#method.strong_count"><code class="language-plaintext highlighter-rouge">Rc::strong_count</code></a> (which returns the number of strong pointers to
 the underlying data currently live), being defined as associated functions.</p>
 
