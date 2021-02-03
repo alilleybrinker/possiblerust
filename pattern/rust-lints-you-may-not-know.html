@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"Rust Lints You May Not Know","dateModified":"2020-06-21T15:59:00-07:00","datePublished":"2020-06-21T15:59:00-07:00","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know"},"url":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know","description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"Rust Lints You May Not Know","url":"https://www.possiblerust.com/pattern/rust-lints-you-may-not-know","datePublished":"2020-06-21T15:59:00-07:00","description":"The Rust compiler ships with a number of useful lints on by default, and many use Clippy to provide additional lints. It’s less well known that the Rust compiler ships with some useful lints which are set to allow by default, meaning they don’t generate warnings. In this post, I’ll explain what each of these lints does, and why it might be useful.","dateModified":"2020-06-21T15:59:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -220,7 +220,7 @@
                 </li>
             
                 <li class="tags-item">
-                    <a class="plain" href="/tags#trait-objects">#trait objects<span>1</span></a>
+                    <a class="plain" href="/tags#trait-objects">#trait objects<span>2</span></a>
                 </li>
             
                 <li class="tags-item">
@@ -469,11 +469,10 @@ flagged by this lint.</p>
     <div class="box-body">
         <div class="box-content">
             
-<p>Clippy offers a useful lint called <a href="https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless “Documentation for the cast_lossless Clippy lint”">“cast lossless”</a>,
+<p>Clippy offers a useful lint called <a href="https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless" title="Documentation for the cast_lossless Clippy lint">“cast lossless”</a>,
 which flags uses of <code class="language-plaintext highlighter-rouge">as</code>-conversions which could be replaced by generally
 clearer and safer <code class="language-plaintext highlighter-rouge">Into</code>/<code class="language-plaintext highlighter-rouge">From</code>-conversions which, unlike <code class="language-plaintext highlighter-rouge">as</code>-conversions,
 are guaranteed to be lossless.</p>
-
 
         </div>
     </div>
@@ -569,7 +568,6 @@ are not permitted at all in Rust 2018.</p>
 bare trait object lint as being allowed by default. In fact, this lint is now set to
 warn by default in both Rust 2015 and 2018, and has therefore been removed from
 this post.</p>
-
         </div>
     </div>
 </div>

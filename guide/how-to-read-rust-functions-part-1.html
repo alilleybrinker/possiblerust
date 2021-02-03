@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"How to Read Rust Functions, Part 1","dateModified":"2021-01-26T12:00:00-08:00","datePublished":"2021-01-26T12:00:00-08:00","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/how-to-read-rust-functions-part-1"},"url":"https://www.possiblerust.com/guide/how-to-read-rust-functions-part-1","description":"Rust functions are surprisingly diverse, sitting at the intersection of multiple language features which may take time to understand. In this post, we’ll walk through those features and explain how they appear in function signatures, so you can be well-equipped to understand functions you see in the wild, or identify the best way to write the functions you need in your own code.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/how-to-read-rust-functions-part-1"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"How to Read Rust Functions, Part 1","url":"https://www.possiblerust.com/guide/how-to-read-rust-functions-part-1","datePublished":"2021-01-26T12:00:00-08:00","description":"Rust functions are surprisingly diverse, sitting at the intersection of multiple language features which may take time to understand. In this post, we’ll walk through those features and explain how they appear in function signatures, so you can be well-equipped to understand functions you see in the wild, or identify the best way to write the functions you need in your own code.","dateModified":"2021-01-26T12:00:00-08:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -220,7 +220,7 @@
                 </li>
             
                 <li class="tags-item">
-                    <a class="plain" href="/tags#trait-objects">#trait objects<span>1</span></a>
+                    <a class="plain" href="/tags#trait-objects">#trait objects<span>2</span></a>
                 </li>
             
                 <li class="tags-item">
@@ -376,7 +376,6 @@ and learning to read other people’s code in any language is a valuable skill.<
 
 <p>This is the first of a pair of posts describing how to read Rust function signatures. Part 2,
 tackling generic functions, is currently in the works.</p>
-
         </div>
     </div>
 </div>
@@ -1232,7 +1231,6 @@ is moved, but not the whole type. If a partial move is relocated to a method tha
 <code class="language-plaintext highlighter-rouge">self</code>, then the move is no longer partial in the calling context, which may cause a compilation
 error. Dr. David Pearce has <a href="https://whileydave.com/2020/11/30/understanding-partial-moves-in-rust/">a more in-depth guide to partial moves</a> which explains them nicely.</p>
 
-
         </div>
     </div>
 </div>
@@ -1277,7 +1275,6 @@ to them, and in the case of unsized types, that size is unknown. So monomorphizi
 where <code class="language-plaintext highlighter-rouge">Self</code> doesn’t implement <code class="language-plaintext highlighter-rouge">Sized</code> doesn’t work in all cases, and is therefore rejected by the
 Rust compiler. Wrapping <code class="language-plaintext highlighter-rouge">Self</code> in a <code class="language-plaintext highlighter-rouge">Box</code> or other pointer makes the size known (it’s the size of
 a pointer type).</p>
-
 
         </div>
     </div>
@@ -1372,7 +1369,6 @@ Trait Bounds.</li>
 yet decided whether it will include coverage of const generics and specialization, both improvements
 to Rust’s type system which entail syntactic additions and <em>could</em> be covered in this post, but which
 are unfinished and unstable, and so may be premature to cover at this time.</p>
-
         </div>
     </div>
 </div>
@@ -1428,7 +1424,10 @@ are unfinished and unstable, and so may be premature to cover at this time.</p>
 
     <div class="other-posts">
         
-            <div></div>
+            <a href="/pattern/3-things-to-try-when-you-can-t-make-a-trait-object">
+                <span>Newer Post</span>
+                <h4>3 Things to Try When You Can't Make a Trait Object</h4>
+            </a>
         
 
         
