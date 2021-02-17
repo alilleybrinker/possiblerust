@@ -366,7 +366,7 @@ the terms in a more complete way.</p>
     <dd class="subdfn">When an outer type which implements <code>Deref</code> or <code>DerefMut</code> has a method which matches the name of a method on the inner type. In this case, deref coercion will fail to call the method on the inner type which may be surprising. Due to this possibility, <a href="#smart-pointer">smart pointer</a> types often implement their functionality as <a href="#associated-function">associated functions</a>.</dd>
 
     <dt id="method">Method</dt>
-    <dd>A function associated with a type which includes a <a href="#receiver">receiver</a> (a <code>self</code> parameter), indicating they can access the internal fields of the type.</dd>
+    <dd>A function associated with a type which includes a <a href="#receiver">receiver</a> (a <code>self</code> parameter), and which may be called using "dot notation" (<code>my_var.some_method()</code>, as a shorthand for <code>MyType::some_method(my_var)</code>).</dd>
 
     <dt id="monomorphization">Monomorphization <span class="also">(also: Monomorphize)</span></dt>
     <dd>The process of generating concrete copies of generic functions. During monomorphization, the compiler identifies all the concrete combinations of types each generic function or type is instantiated with, and generates a copy for each unique combination, replacing the relevant calls or constructions with the non-generic version. This enables Rust generics to avoid having an impact on performance, as they compile down to normal function calls.</dd>
