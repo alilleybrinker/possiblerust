@@ -4,7 +4,7 @@
         <meta charset="utf-8">
 
         
-            <title>Inbound & Outbound FFI - Possible Rust</title>
+            <title>Glossary - Possible Rust</title>
         
 
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -24,26 +24,24 @@
 
         <!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Inbound &amp; Outbound FFI" />
+<meta property="og:title" content="Glossary" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of new languages into existing codebases or building on existing libraries. That said, the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the area can seem overwhelming to approach. In this post, I explain the two “directions” of FFI, some patterns for how FFI in each direction is handled in Rust and further break down some FFI design approaches." />
-<meta property="og:description" content="Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of new languages into existing codebases or building on existing libraries. That said, the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the area can seem overwhelming to approach. In this post, I explain the two “directions” of FFI, some patterns for how FFI in each direction is handled in Rust and further break down some FFI design approaches." />
-<link rel="canonical" href="https://www.possiblerust.com/guide/inbound-outbound-ffi" />
-<meta property="og:url" content="https://www.possiblerust.com/guide/inbound-outbound-ffi" />
+<meta name="description" content="Learning what’s possible in Rust." />
+<meta property="og:description" content="Learning what’s possible in Rust." />
+<link rel="canonical" href="https://www.possiblerust.com/glossary/" />
+<meta property="og:url" content="https://www.possiblerust.com/glossary/" />
 <meta property="og:site_name" content="Possible Rust" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2020-08-05T18:10:00-07:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Inbound &amp; Outbound FFI" />
+<meta property="twitter:title" content="Glossary" />
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/guide/inbound-outbound-ffi"},"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"Inbound &amp; Outbound FFI","url":"https://www.possiblerust.com/guide/inbound-outbound-ffi","datePublished":"2020-08-05T18:10:00-07:00","description":"Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of new languages into existing codebases or building on existing libraries. That said, the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the area can seem overwhelming to approach. In this post, I explain the two “directions” of FFI, some patterns for how FFI in each direction is handled in Rust and further break down some FFI design approaches.","dateModified":"2020-08-05T18:10:00-07:00","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"author":{"@type":"Person","name":"Andrew Lilley Brinker"},"headline":"Glossary","url":"https://www.possiblerust.com/glossary/","description":"Learning what’s possible in Rust.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
-    <body class=" post-page">
+    <body class=" ">
         <div id="top"></div>
         <div class="site">
             <div class="mobile-only">
@@ -288,255 +286,120 @@ Feed</a>
 
                 <div class="site-content">
                             
-                        <h2 class="site-title">Inbound & Outbound FFI</h2>
+                        <h2 class="site-title">Glossary</h2>
                         
-                            <p class="post-preview-meta">
-                                Aug 5th, 2020
- &middot;  <a href="/guide" class="meta">Guide</a>  
- &middot;  <a href="/tags#ffi" class="meta">#ffi</a>  
-                            </p>
+                            <br>
                         
                     
 
-                    <div class="post " role="main">
-    
-    
-    <div class="post-content" role="article">
-        <p>Foreign Function Interfaces (FFI) are a core mechanism for enabling integration of
-new languages into existing codebases or building on existing libraries. That said,
-the term “FFI” is often overloaded in ways that may be unclear or ambiguous, and the
-area can seem overwhelming to approach. In this post, I explain the two “directions”
-of FFI, some patterns for how FFI in each direction is handled in Rust and further
-break down some FFI design approaches.</p>
+                    <div class="page">
+    <p>Rust has a lot of terminology which you may find hard to understand or remember.
+While explanatory blog posts are useful, it's also nice to have a glossary of
+Rust terms which you can reference whenever you need to.</p>
 
-<!-- more -->
+<p>This page is intended to be updated and grow over time, as new definitions are
+written or new terms become more widespread. It will also, where possible, link
+to posts elsewhere on the site which describe these terms in greater deapth. It
+<em>does not</em> link to any article which uses the terms, only to ones which explain
+the terms in a more complete way.</p>
 
-<p>When we talk about FFI, we talk about it to possible directions: “outbound,” where
-we’re exposing functionality in our primary language for use in other languages, and
-“inbound,” where we’re wrapping functionality from other languages to be used in our
-primary language. Unfortunately, both are often just called “FFI,” which can be
-confusing.</p>
+<h2>Table of Contents</h2>
 
-<h2 id="inbound-ffi-in-rust">Inbound FFI in Rust</h2>
-
-<p>For new languages, inbound FFI is more common. This is unsurprising, as there already
-exists a lot of code in other languages that you may want to have access to use. The
-focus in inbound FFI is wrapping the API provided by the other language (often that
-language is C, otherwise it’s exposing a C-compatible interface) into something your
-current language understands, called <em>bindings</em>.</p>
-
-<h3 id="bindings">Bindings</h3>
-
-<p>Bindings are what make sure the two languages both understand the types and functions
-in play.</p>
-
-<p>In Rust, that means:</p>
-
-<ul>
-  <li>Data types that are marked <a href="https://doc.rust-lang.org/reference/type-layout.html#the-c-representation"><code class="language-plaintext highlighter-rouge">#[repr(C)]</code></a>, meaning they have the same hardware
-representation as the equivalent C data type would have.</li>
-  <li>Functions inside an <a href="https://doc.rust-lang.org/std/keyword.extern.html"><code class="language-plaintext highlighter-rouge">extern "C"</code></a> block, with only a function signature provided,
-telling the compiler that this function exists and will be provided by some
-other library at link time.</li>
-</ul>
-
-<p>This work can be tedious! Thankfully there’s an official Rust tool called <a href="https://github.com/rust-lang/rust-bindgen">“bindgen”</a>
-that can usually generate these bindings for you. Bindgen takes a C header file as input
-and outputs a Rust file defining a matching interface, enabling the two languages to talk
-to each other.</p>
-
-<h3 id="idiomatic-wrappers">Idiomatic Wrappers</h3>
-
-<p>While this step is often the first when writing inbound FFI in Rust, the second step is
-crucial. Rust’s safety mechanisms are one of its key selling points, and FFI inherently gives
-up certain guarantees, as the Rust compiler can’t reason about code in another language.
-Additionally, API’s in other languages are often not built in a manner which is naturally
-amenable to the kind of architecture Rust’s rules encourage.</p>
-
-<aside id="aside-1">
-    <h4><span class="aside-num">Aside 1:</span> <span class="aside-title">An example of problematic cross-language patterns</span> <a href="#aside-1" class="aside-link"><span>↺</span></a></h4>
-    <a class="visually-hidden" href="#skip-aside-1">Skip this content.</a>
-    
-<p>The <a href="https://radek.io/2012/11/10/magical-container_of-macro/"><code class="language-plaintext highlighter-rouge">container_of</code></a> macro from the Linux kernel is a good example of something that is
-natural in C and would be rejected by Rust. The macro takes in a pointer to a field of a
-struct, the name of the type of the struct, and the name of the field in the struct, and
-returns a pointer to the overall container.</p>
-
-<p>In Rust, if you have a reference to a field of a struct, the ability to derive from it
-a reference to the overall struct would break Rust’s reasoning about struct field borrows
-being distinct, and so this pattern is not allowed.</p>
-
-<p>If you’re working with an inbound FFI API, and it expects use of a pattern like this, you
-may find it difficult to use from Rust, and the FFI interface may require more work to
-make it feel natural in a Rust codebase.</p>
-
-    <div id="skip-aside-1"></div>
-</aside>
-
-<p>The next step is therefore usually to write a wrapper around the bindings which provides
-a more natural and idiomatic API for use in Rust. Commonly this pattern manifests with
-two crates, one called <code class="language-plaintext highlighter-rouge">*-sys</code> (replacing <code class="language-plaintext highlighter-rouge">*</code> with the name of the original API you’re
-binding to), and the other without the <code class="language-plaintext highlighter-rouge">*-sys</code> suffix.</p>
-
-<p>This second step, of writing the idiomatic bindings, can be hard! If you’ve used Rust
-much, you’ve probably noticed that Rust’s rules that all data has one owner, and
-that references may be aliasing or mutable but never both at the same time impact
-the designs that work comfortably. While you may be able to loosen them with
-use of interior mutability or reference counting, that may involve trade-offs in
-code clarity or performance.</p>
-
-<div class="box box--info" id="info-1">
-    <header class="box-header">
-        <h4 class="box-title"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>note</title>
-<path d="M29.395 2.58c-1.645-1.643-3.811-2.58-5.946-2.58-1.801 0-3.459 0.668-4.67 1.877l-4.867 4.904c-0.015 0.014-0.032 0.023-0.047 0.038-0.008 0.008-0.013 0.019-0.021 0.026l0.002 0.002-10.329 10.409c-0.476 0.473-0.821 1.062-1.013 1.705l-2.349 8.508c-0.002 0.023-0.155 0.691-0.155 1.031 0 1.932 1.569 3.5 3.504 3.5 0.385 0 1.13-0.184 1.157-0.188l8.478-2.229c0.644-0.191 1.229-0.539 1.705-1.016l15.263-15.383c2.776-2.778 2.463-7.434-0.712-10.604zM16.014 23.795c-0.082-0.902-0.337-1.787-0.719-2.627l9.455-9.454c0.578 1.826 0.281 3.736-0.986 5.004-0.008 0.008-0.018 0.013-0.025 0.021l0.014 0.013-7.728 7.79c0-0.249 0.012-0.493-0.011-0.747zM14.793 20.256c-0.373-0.613-0.797-1.205-1.322-1.729-0.611-0.611-1.312-1.090-2.044-1.492l9.532-9.532c0.748 0.332 1.465 0.805 2.098 1.438 0.541 0.539 0.959 1.143 1.281 1.771l-9.545 9.544zM10.486 16.562c-0.926-0.373-1.896-0.586-2.868-0.599l7.703-7.762c1.179-1.15 2.896-1.481 4.587-1.062l-9.422 9.423zM4.167 29.873c-0.109 0.025-0.448 0.111-0.678 0.127-0.822-0.010-1.489-0.678-1.489-1.5 0.012-0.168 0.079-0.457 0.102-0.562l1.053-3.814c1.143-0.031 2.373 0.414 3.34 1.383 0.982 0.98 1.444 2.234 1.394 3.391l-3.722 0.975zM8.874 28.637c-0.024-1.342-0.57-2.738-1.672-3.838-1.042-1.043-2.406-1.645-3.766-1.699l0.996-3.607c0.072-0.24 0.215-0.477 0.391-0.684 2.006-1.436 5.091-1.012 7.234 1.133 2.267 2.266 2.617 5.586 0.871 7.568-0.116 0.061-0.233 0.119-0.359 0.156l-3.695 0.971zM28.691 11.772l-1.684 1.697c0-0.226 0.027-0.443 0.006-0.674-0.176-1.935-1.078-3.806-2.543-5.269-1.629-1.63-3.789-2.565-5.928-2.571l1.656-1.67c0.829-0.827 1.986-1.285 3.251-1.285 1.609 0 3.262 0.728 4.533 1.995 1.193 1.191 1.904 2.671 2.006 4.168 0.094 1.397-0.367 2.678-1.297 3.609z"></path>
-</svg>
- <span class="box-num">Info 1</span> “Choosing Your Guarantees”</h4>
-        <a class="visually-hidden" href="#skip-info-1">Skip this content.</a>
-    </header>
-    <div class="box-body">
-        <div class="box-content">
-            
-<p><a href="https://manishearth.github.io/blog/2015/05/27/wrapper-types-in-rust-choosing-your-guarantees/">“Choosing Your Guarantees”</a> by Manish Goregaokar is a classic post in the Rust community
-explaining the different relaxations offered by Rust’s various wrapper types. It’s a little out
-of date now (written in 2015), but is still a very useful resource.</p>
-
-        </div>
-    </div>
+<div class="toc">
+    <ul class="toc-list">
+        <li class="toc-item"><a href="#associated-function">Associated Function</a></li>
+        <li class="toc-item"><a href="#binding">Binding</a></li>
+        <li class="toc-item">
+            <a href="#borrow">Borrow</a>
+            <ul class="toc-sublist">
+                <li class="toc-item"><a href="#borrow--disjoint">Borrow, Disjoint</a></li>
+            </ul>
+        </li>
+        <li class="toc-item">
+            <a href="#deref">Deref</a>
+            <ul class="toc-sublist">
+                <li class="toc-item"><a href="#deref--coercion">Deref, Coercion</a></li>
+                <li class="toc-item"><a href="#deref--collision">Deref, Collision</a></li>
+            </ul>
+        </li>
+        <li class="toc-item"><a href="#method">Method</a></li>
+        <li class="toc-item"><a href="#monomorphization">Monomorphization</a></li>
+        <li class="toc-item">
+            <a href="#move">Move</a>
+            <ul class="toc-sublist">
+                <li class="toc-item"><a href="#move--partial">Move, Partial</a></li>
+            </ul>
+        </li>
+        <li class="toc-item">
+            <a href="#pattern">Pattern</a>
+            <ul class="toc-sublist">
+                <li class="toc-item"><a href="#pattern--refutable">Pattern, Refutable</a></li>
+                <li class="toc-item"><a href="#pattern--irrefutable">Pattern, Irrefutable</a></li>
+            </ul>
+        </li>
+        <li class="toc-item"><a href="#receiver">Receiver</a></li>
+        <li class="toc-item"><a href="#smart-pointer">Smart Pointer</a></li>
+        <li class="toc-item"><a href="#type-ascription">Type Ascription</a></li>
+    </ul>
 </div>
-<div id="skip-info-1"></div>
 
-<h2 id="outbound-ffi-in-rust">Outbound FFI in Rust</h2>
+<dl class="glossary">
+    <dt id="associated-function">Associated Function</dt>
+    <dd>Functions written in an <code>impl</code> block for a type which do not take a <code>self</code> parameter. These may be called as <code>TypeName::function_name</code> and are commonly used for constructors or to avoid <a href="#deref--collision">deref collision</a>.</dd>
 
-<p>Outbound FFI in Rust is becoming more common as Rust gains wider use and its key strengths
-and trade-offs make it the right choice for certain programming contexts. With outbound
-FFI, you’re exposing Rust code for other languages to use.</p>
+    <dt id="binding">Binding</dt>
+    <dd>The assignment of a value to a variable name. Bindings are one of two core features of <a href="#pattern">patterns</a>, alongside matching. In their simplest form they may appear as <code>let a = 5</code>, where <code>a</code> is bound to the value <code>5</code>, or in a function like <code>some_function(32)</code> where the formal parameter in the function body is bound to the actual parameter value <code>32</code>. They may also appear in more complex patterns involving destructuring and binding of some internal values within the structure.</dd>
 
-<p>In this context, you have two choices for how to do it: invasively or non-invasively.</p>
+    <dt id="borrow">Borrow</dt>
+    <dd>One of two fundamental possessive states for variables in Rust, the other being ownership. Borrows are guaranteed not to exceed the lifetime of the borrowed data, to never be null, and to be either mutable exclusive-or aliasing. Rust enforces these guarantees using the borrow checker, and encodes the necessary invariants to prove these properties using lifetimes and lifetime bounds.</dd>
 
-<h3 id="invasive-outbound-ffi">Invasive Outbound FFI</h3>
+    <dt id="borrow--disjoint" class="subdfn">Borrow, Disjoint</dt>
+    <dd class="subdfn">Two borrows are said to be disjoint if they are of two different pieces of underlying data. In the case of two borrows from the same structure, the Rust compiler can tell if two separate fields in a <code>struct</code> are borrowed and know that those borrows are disjoint.</dd>
 
-<p>In invasive outbound FFI, you construct the internal types and functions of your Rust crate
-to be amenable to direct exposure to other languages. Not all Rust types can be exposed
-over FFI, so choosing outbound FFI may mean choosing type representations which aren’t
-natural on the Rust side, but which make the work of exposing the crate to other languages
-easier.</p>
+    <dt id="deref">Deref</dt>
+    <dd>A mechanism for conversion of a type to another type during dereferencing, implemented by the <code>Deref</code> or <code>DerefMut</code> traits on the initial type.</dd>
 
-<p>The tool <a href="https://github.com/eqrion/cbindgen"><code class="language-plaintext highlighter-rouge">cbindgen</code></a> is a popular choice for generating C bindings for Rust
-code (the outbound FFI version of <code class="language-plaintext highlighter-rouge">bindgen</code>), and notes what kinds of types it can
-directly generated C-equivalents for in the <a href="https://github.com/eqrion/cbindgen/blob/master/docs.md#supported-types">“Supported Types”</a> section of its
-documentation.</p>
+    <dt id="deref--coercion" class="subdfn">Deref, <span class="new">Coercion</span></dt>
+    <dd class="subdfn">Automatic conversion of a type to the type is derefs to, possibly recursively. This is performed during method calls to enable calling methods on the inner type when working with a <a href="#smart-pointer">smart pointer</a>.</dd>
 
-<p>Invasive outbound FFI is an approach that tries to ensure internal Rust types fit the
-rules of what <code class="language-plaintext highlighter-rouge">cbindgen</code> can generate bindings for.</p>
+    <dt id="deref--collision" class="subdfn">Deref, <span class="new">Collision</span></dt>
+    <dd class="subdfn">When an outer type which implements <code>Deref</code> or <code>DerefMut</code> has a method which matches the name of a method on the inner type. In this case, deref coercion will fail to call the method on the inner type which may be surprising. Due to this possibility, <a href="#smart-pointer">smart pointer</a> types often implement their functionality as <a href="#associated-function">associated functions</a>.</dd>
 
-<h3 id="non-invasive-outbound-ffi">Non-Invasive Outbound FFI</h3>
+    <dt id="method">Method</dt>
+    <dd>A function associated with a type which includes a <a href="#receiver">receiver</a> (a <code>self</code> parameter), indicating they can access the internal fields of the type.</dd>
 
-<p>So, non-invasive outbound FFI is therefore an approach that <em>doesn’t</em> do this. In
-non-invasive outbound FFI, you generally instead choose <em>not to</em> expose Rust types
-across the FFI boundary, instead exposing <em>opaque pointers</em>, meaning pointers to
-types where the external language knows the name of the type, but nothing about its
-contents.</p>
+    <dt id="monomorphization">Monomorphization <span class="also">(also: Monomorphize)</span></dt>
+    <dd>The process of generating concrete copies of generic functions. During monomorphization, the compiler identifies all the concrete combinations of types each generic function or type is instantiated with, and generates a copy for each unique combination, replacing the relevant calls or constructions with the non-generic version. This enables Rust generics to avoid having an impact on performance, as they compile down to normal function calls.</dd>
 
-<p>With <code class="language-plaintext highlighter-rouge">cbindgen</code>, you can get this type representation as output by having a type which
-is public, but not <code class="language-plaintext highlighter-rouge">#[repr(C)]</code>, meaning it’s not guaranteed to have a layout C can
-understand.</p>
+    <dt id="move">Move</dt>
+    <dd>A copy of data from one binding to another which invalidates the previous owner. Moves are always guaranteed to be bitwise copies of the data contained in the type, equivalent to a <code>memcpy</code> of the appropriate size. Invalidation of the prior owner ensures Rust's safety guarantees can be upheld. Moves are implicit during <a href="#binding">binding</a>. A type which implements the <code>Copy</code> trait does <em>not</em> invalidate the prior owner, as the trait ensures that this duplication does not result in the creation of dangling resources.</dd>
 
-<p>Since the outside language knows nothing about your type, including its fields, a
-non-invasive FFI approach needs to expose functions which replace the getting, setting,
-iterating, and other operations the outside language might want to do.</p>
+    <dt id="move--partial" class="subdfn">Move, <span class="new">Partial</span></dt>
+    <dd class="subdfn">Types with fields may have those fields moved out without the overall value being moved to a new owner, so long as the prior owner of the moved field does not attempt to access it after the move.</dd>
 
-<p>To avoid dangling pointers, this approach also means you’ll need to put your opaque Rust
-types on the heap and then leak the pointer (transferring ownership to
-the outside language) via <a href="https://doc.rust-lang.org/std/boxed/struct.Box.html#method.into_raw"><code class="language-plaintext highlighter-rouge">Box::into_raw</code></a>. This heap allocation may be
-undesirable in certain contexts, so as always, choosing between invasive and non-invasive
-designs involves trade-offs.</p>
+    <dt id="pattern">Pattern</dt>
+    <dd>A mechanism for matching and binding against the structure of types. Patterns appear in variable assignment, function signatures, and any matching constructs (including <code>match</code>, <code>if let</code> <code>while let</code>, and the <code>matches!</code> macro).</dd>
 
-<h3 id="reality">Reality</h3>
+    <dt id="pattern--refutable" class="subdfn">Pattern, <span class="new">Refutable</span></dt>
+    <dd class="subdfn">A pattern is refutable if it is possible for the pattern to fail to match a valid value of the relevant type. <code>match</code>, <code>if let</code>, <code>while let</code>, and the <code>matches!</code> macro can use refutable patterns. <code>match</code> requires that the overall block covers all possible values of the type (is "total") while the others conditionally execute or return a value dependent on whether matching succeeds.</dd>
 
-<p>In reality, any outbound FFI in Rust is likely to involve a mix of invasive and non-invasive
-approaches, as appropriate.</p>
+    <dt id="pattern--irrefutable" class="subdfn">Pattern, <span class="new">Irrefutable</span></dt>
+    <dd class="subdfn">A pattern is irrefutable if it will match any possible value of the relevant type. Patterns in assignment and function parameters must be irrefutable, as Rust doesn't permit the definition of partial functions.</dd>
 
-<p>Regardless of whether inbound or outbound FFI is used, great care must be taken to ensure
-safety invariants are maintained. Anyone approaching FFI in Rust ought to read at least the
-first eight chapters of <a href="https://doc.rust-lang.org/stable/nomicon/">The Rustomicon</a>, which cover how to reason about unsafety.</p>
+    <dt id="receiver">Receiver</dt>
+    <dd>The name of the <code>self</code> parameter in a <a href="#method">method</a>. Often written with the <code>self</code>, <code>&self</code>, or <code>&mut self</code> shorthands, but may alternatively be written <code>self: Self</code> where the <code>Self</code> type may be a number of different types which <a href="#deref--coercion">deref</a> to <code>Self</code>.</dd>
 
-<aside id="aside-2">
-    <h4><span class="aside-num">Aside 2:</span> <span class="aside-title">Way Cooler &amp; Unsafety</span> <a href="#aside-2" class="aside-link"><span>↺</span></a></h4>
-    <a class="visually-hidden" href="#skip-aside-2">Skip this content.</a>
-    
-<p>The Way Cooler project is an example of the challenges of working with unsafe correctly, even
-when great care is taken to do so. Their <a href="http://way-cooler.org/blog/2020/01/09/way-cooler-post-mortem.html">post-mortem</a> on the use of Rust discusses their
-challenges in detail. Remember, sometimes unsafe isn’t worth it, and (more importantly)
-sometimes Rust isn’t the right language to use.</p>
+    <dt id="smart-pointer">Smart Pointer</dt>
+    <dd>A type of pointer to a type which 1) provides some behavior beyond a raw pointer, and 2) is designed to be used like the wrapped type as transparently as possible, through  the <code>Deref</code> trait and <a href="#deref--coercion">deref coercion</a>.</dd>
 
-    <div id="skip-aside-2"></div>
-</aside>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>FFI is an important area in any language’s design, and Rust is no exception. Hopefully this post
-has clarified some of what is meant when people talk about FFI, and has usefully outlined approaches
-one can take in structuring inbound and outbound FFI designs.</p>
+    <dt id="type-ascription">Type Ascription</dt>
+    <dd>The name for explicit specification of a value's type, written in the form <code>value: type</code>. An example would be <code>let a: i32 = 4;</code>, which specifies the type of <code>a</code> to be <code>i32</code> through <em>type ascription</em>.</dd>
+</dl>
 
 
-    </div>
 
-    
-        <div class="discuss">
-            <div class="discuss-content">
-                <section class="discuss-section">
-                    <p><strong>Possible Rust</strong> succeeds when more people can join in learning about Rust! Please take a moment to share, <em>especially</em> if you have questions or if you disagree!</p>
-
-                    <a target="_blank" href="https://twitter.com/intent/tweet?text=https://www.possiblerust.com/guide/inbound-outbound-ffi" class="button button--block">Share on Twitter</a>
-                </section>
-                <section class="discuss-section ">
-                    
-                        <h4>Discussions</h4>
-
-                        <ul class="discuss-list">
-                            
-                            
-                            
-                                <li class="discuss-list-item"><a target="_blank" href="https://lobste.rs/s/lfxoew/inbound_outbound_ffi"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>lobsters</title>
-<path d="M20.682 3.732c-0.473-0.472-1.1-0.732-1.768-0.732s-1.295 0.26-1.77 0.733l-1.41 1.412c-0.473 0.472-0.734 1.1-0.734 1.769 0 0.471 0.129 0.922 0.371 1.313l-13.577 5.439c-0.908 0.399-1.559 1.218-1.742 2.189-0.185 0.977 0.125 1.979 0.834 2.687l12.72 12.58c0.548 0.548 1.276 0.859 2.045 0.877 0.018 0.001 0.060 0.001 0.078 0.001 0.202 0 0.407-0.021 0.61-0.062 0.994-0.206 1.808-0.893 2.177-1.828l5.342-13.376c0.402 0.265 0.875 0.407 1.367 0.407 0.67 0 1.297-0.261 1.768-0.733l1.407-1.408c0.477-0.474 0.738-1.103 0.738-1.773s-0.262-1.3-0.732-1.768l-7.724-7.727zM16.659 29.367c-0.124 0.313-0.397 0.544-0.727 0.612-0.076 0.016-0.153 0.022-0.229 0.021-0.254-0.006-0.499-0.108-0.682-0.292l-12.728-12.588c-0.234-0.233-0.337-0.567-0.275-0.893 0.061-0.324 0.279-0.598 0.582-0.73l6.217-2.49c4.189 1.393 8.379 0.051 12.57 4.522l-4.728 11.838zM26.992 13.58l-1.414 1.413c-0.195 0.196-0.512 0.196-0.707 0l-1.768-1.767-1.432 3.589 0.119-0.303c-3.010-3.005-6.069-3.384-8.829-3.723-0.887-0.109-1.747-0.223-2.592-0.405l8.491-3.401-1.715-1.715c-0.195-0.195-0.195-0.512 0-0.707l1.414-1.415c0.195-0.195 0.512-0.195 0.707 0l7.725 7.727c0.198 0.195 0.198 0.512 0.001 0.707zM16.5 21c1.378 0 2.5-1.121 2.5-2.5s-1.121-2.5-2.5-2.5c-1.379 0-2.5 1.121-2.5 2.5s1.122 2.5 2.5 2.5zM16.5 17c0.828 0 1.5 0.672 1.5 1.5s-0.672 1.5-1.5 1.5c-0.829 0-1.5-0.672-1.5-1.5s0.671-1.5 1.5-1.5zM29.5 0c-1.379 0-2.5 1.121-2.5 2.5s1.121 2.5 2.5 2.5 2.5-1.121 2.5-2.5-1.121-2.5-2.5-2.5zM29.5 4c-0.828 0-1.5-0.672-1.5-1.5s0.672-1.5 1.5-1.5 1.5 0.672 1.5 1.5-0.672 1.5-1.5 1.5zM8 17c0 1.103 0.897 2 2 2s2-0.897 2-2-0.897-2-2-2-2 0.897-2 2zM10 16c0.552 0 1 0.447 1 1s-0.448 1-1 1-1-0.447-1-1 0.448-1 1-1zM12 23c0-0.552 0.448-1 1-1s1 0.448 1 1c0 0.552-0.448 1-1 1s-1-0.448-1-1zM28 8c0-0.552 0.448-1 1-1s1 0.448 1 1c0 0.552-0.448 1-1 1s-1-0.448-1-1z"></path>
-</svg>
- Discuss on Lobste.rs</a></li>
-                            
-                            
-                                <li class="discuss-list-item"><a target="_blank" href="https://www.reddit.com/r/rust/comments/i4j5ts/inbound_outbound_ffi/"><!-- Generated by IcoMoon.io -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-<title>reddit</title>
-<path d="M28.111 5.022l-1.215-3.655c-0.271-0.817-1.035-1.367-1.896-1.367h-18c-0.862 0-1.625 0.55-1.898 1.367l-1.225 3.657c-1.044 0.067-1.877 0.915-1.877 1.976v3c0 1.104 0.896 2 2 2h1.034c0 0.075-0.030 0.146-0.021 0.221l2 18c0.112 1.011 0.967 1.779 1.987 1.779h14c1.020 0 1.875-0.768 1.986-1.779l2-18c0.010-0.075-0.021-0.146-0.021-0.221h1.035c1.104 0 2-0.896 2-2v-3c0-1.065-0.84-1.917-1.889-1.978zM7 2h18l1 3h-20l1-3zM9 30l-0.333-3h14.666l-0.333 3h-14zM23.443 26h-14.888l-1.111-10h17.111l-1.112 10zM24.666 15h-17.333l-0.333-3h18l-0.334 3zM28 10h-24v-3h24v3z"></path>
-</svg>
- Discuss on /r/Rust</a></li>
-                            
-                        </ul>
-                    
-                </section>
-            </div>
-        </div>
-    
-
-    <div class="other-posts">
-        
-            <a href="/community/how-to-read-first-impression-posts">
-                <span>Newer Post</span>
-                <h4>How to Read First Impression Posts</h4>
-            </a>
-        
-
-        
-            <a href="/guide/enum-or-trait-object">
-                <span>Older Post</span>
-                <h4>Enum or Trait Object</h4>
-            </a>
-        
-    </div>
 </div>
+
 
                 </div>
             </div>

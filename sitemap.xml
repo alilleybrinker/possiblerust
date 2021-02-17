@@ -35,7 +35,7 @@
 <loc>https://www.possiblerust.com/archive/</loc>
 </url>
 <url>
-<loc>https://www.possiblerust.com/tags/</loc>
+<loc>https://www.possiblerust.com/glossary/</loc>
 </url>
 <url>
 <loc>https://www.possiblerust.com/pattern/</loc>
@@ -48,6 +48,9 @@
 </url>
 <url>
 <loc>https://www.possiblerust.com/meta/</loc>
+</url>
+<url>
+<loc>https://www.possiblerust.com/tags/</loc>
 </url>
 <url>
 <loc>https://www.possiblerust.com/colophon/</loc>
