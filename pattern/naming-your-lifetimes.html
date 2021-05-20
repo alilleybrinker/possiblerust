@@ -4,7 +4,7 @@
         <meta charset="utf-8">
 
         
-            <title>Archive - Possible Rust</title>
+            <title>Naming Your Lifetimes - Possible Rust</title>
         
 
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -24,24 +24,26 @@
 
         <!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v4.2.0" />
-<meta property="og:title" content="Archive" />
+<meta property="og:title" content="Naming Your Lifetimes" />
 <meta name="author" content="Andrew Lilley Brinker" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Learning what’s possible in Rust." />
-<meta property="og:description" content="Learning what’s possible in Rust." />
-<link rel="canonical" href="https://www.possiblerust.com/archive/" />
-<meta property="og:url" content="https://www.possiblerust.com/archive/" />
+<meta name="description" content="You may not know this, but it’s possible to give names to your lifetimes which are longer than a single character! Effectively naming your lifetimes can help improve code clarity in several scenarios, which this post describes in detail." />
+<meta property="og:description" content="You may not know this, but it’s possible to give names to your lifetimes which are longer than a single character! Effectively naming your lifetimes can help improve code clarity in several scenarios, which this post describes in detail." />
+<link rel="canonical" href="https://www.possiblerust.com/pattern/naming-your-lifetimes" />
+<meta property="og:url" content="https://www.possiblerust.com/pattern/naming-your-lifetimes" />
 <meta property="og:site_name" content="Possible Rust" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-20T15:53:00-07:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Archive" />
+<meta property="twitter:title" content="Naming Your Lifetimes" />
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"Archive","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"url":"https://www.possiblerust.com/archive/","description":"Learning what’s possible in Rust.","@type":"WebPage","@context":"https://schema.org"}</script>
+{"headline":"Naming Your Lifetimes","dateModified":"2021-05-20T15:53:00-07:00","datePublished":"2021-05-20T15:53:00-07:00","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/naming-your-lifetimes"},"url":"https://www.possiblerust.com/pattern/naming-your-lifetimes","description":"You may not know this, but it’s possible to give names to your lifetimes which are longer than a single character! Effectively naming your lifetimes can help improve code clarity in several scenarios, which this post describes in detail.","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
-    <body class=" ">
+    <body class=" post-page">
         <div id="top"></div>
         <div class="site">
             <div class="mobile-only">
@@ -290,86 +292,242 @@ Feed</a>
 
                 <div class="site-content">
                             
-                        <h2 class="site-title">Archive</h2>
+                        <h2 class="site-title">Naming Your Lifetimes</h2>
                         
-                            <br>
+                            <p class="post-preview-meta">
+                                May 20th, 2021
+ &middot;  <a href="/pattern" class="meta">Pattern</a>  
+ &middot;  <a href="/tags#lifetimes" class="meta">#lifetimes</a>  
+                            </p>
                         
                     
 
-                    <div class="archive">
+                    <div class="post " role="main">
     
+    
+    <div class="post-content" role="article">
+        <p>You may not know this, but it’s possible to give names to your lifetimes which are longer
+than a single character! Effectively naming your lifetimes can help improve code clarity
+in several scenarios, which this post describes in detail.</p>
+
+<!-- more -->
+
+<p>If you’ve looked at example Rust code, you’ve likely noticed that lifetimes are usually
+named with a single letter. In your first introduction to lifetimes, where they’re revealed
+explicitly with a transition from an inferred-lifetime code sample to one with explicitly
+named lifetimes, you might have seen something like the following.</p>
+
+<figure class="figure--code  " id="code-1">
+    <a class="visually-hidden" href="#skip-code-1">Skip this content.</a>
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">Person</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">String</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">Person</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="n">name</span><span class="o">&lt;</span><span class="nv">'a</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="nv">'a</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">&amp;</span><span class="nv">'a</span> <span class="nb">str</span> <span class="p">{</span>
+        <span class="o">&amp;</span><span class="k">self</span><span class="py">.name</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span class="figure-opener">Code 1</span> <p>A common type of first lifetime code sample.</p> <a href="#code-1" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-1"></div>
+</figure>
+
+<p>This code example isn’t <em>wrong</em>, and there <em>are</em> certainly a lot of single-letter lifetime
+parameter names in real-world Rust codebases, but the tendency to use these short names in example
+code can leave some Rustaceans with the impression that <em>only</em> single-letter names are allowed,
+but in fact they are! Here’s another version of the above.</p>
+
+<figure class="figure--code  " id="code-2">
+    <a class="visually-hidden" href="#skip-code-2">Skip this content.</a>
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">Person</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">String</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">Person</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="n">name</span><span class="o">&lt;</span><span class="nv">'me</span><span class="o">&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="nv">'me</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">&amp;</span><span class="nv">'me</span> <span class="nb">str</span> <span class="p">{</span>
+        <span class="o">&amp;</span><span class="k">self</span><span class="py">.name</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span class="figure-opener">Code 2</span> <p>A rewrite of the prior example, with a lifetime variable name that’s possibly more helpful.</p> <a href="#code-2" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-2"></div>
+</figure>
+
+<p>There are in fact specific scenarios where effective naming can be quite helpful, including in
+the presence of long-lived common owners whose values are borrowed throughout the code (like
+an allocation arena or configuration struct), or in the presence of multiple borrow sources you
+want to clearly disambiguate.</p>
+
+<h2 id="case-1-long-lived-common-owner">Case 1: Long-Lived Common Owner</h2>
+
+<p>It’s common in many programs to have a single struct which contains a variety of data used throughout
+a program. It may be a configuration struct holding information on how the program was initialized or set
+to run. It may be an arena holding data pulled from outside sources. Whatever the case may be, the pattern
+of centralizing data and then handing out borrows to that data is common, and for good reason. It can reduce
+data duplication and lead to clearer-to-navigate code.</p>
+
+<figure class="figure--code  " id="code-3">
+    <a class="visually-hidden" href="#skip-code-3">Skip this content.</a>
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nn">once_cell</span><span class="p">::</span><span class="nn">unsync</span><span class="p">::</span><span class="n">OnceCell</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">Provider</span> <span class="p">{</span>
+    <span class="n">data_cache</span><span class="p">:</span> <span class="n">OnceCell</span><span class="o">&lt;</span><span class="n">Data</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="n">metadata_cache</span><span class="p">:</span> <span class="n">OnceCell</span><span class="o">&lt;</span><span class="n">Metadata</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c">// ...</span>
+
+<span class="k">fn</span> <span class="nf">process_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Data</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;&amp;</span><span class="nb">str</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c">// ...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span class="figure-opener">Code 3</span> <p>An example of a central data provider with a function processing data from it.</p> <a href="#code-3" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-3"></div>
+</figure>
+
+<p>This example shows an imaginary “data provider,” containing some caches of information used throughout a
+program. It also shows a <code class="language-plaintext highlighter-rouge">process_data</code> function which is operating on data borrowed from the provider. Now,
+in this case the <code class="language-plaintext highlighter-rouge">process_data</code> function can be written as-is, without specifying lifetimes explicitly; the
+fact that there’s only one input lifetime means the output reference is automatically inferred to have the
+same lifetime as the input reference. However, this <code class="language-plaintext highlighter-rouge">process_data</code> function doesn’t make clear that <code class="language-plaintext highlighter-rouge">data</code>
+is coming from the <code class="language-plaintext highlighter-rouge">Provider</code>, and an unwitting developer may attempt to use the data in a way which outlives
+the <code class="language-plaintext highlighter-rouge">Provider</code>. This may be made less likely with appropriate naming.</p>
+
+<figure class="figure--code  " id="code-4">
+    <a class="visually-hidden" href="#skip-code-4">Skip this content.</a>
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="n">process_data</span><span class="o">&lt;</span><span class="nv">'prov</span><span class="o">&gt;</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'prov</span> <span class="n">Data</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Result</span><span class="o">&lt;&amp;</span><span class="nv">'prov</span> <span class="nb">str</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="c">// ...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span class="figure-opener">Code 4</span> <p>A rewrite with explicit lifetimes.</p> <a href="#code-4" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-4"></div>
+</figure>
+
+<p>This example works the same as the prior one, but the use of the <code class="language-plaintext highlighter-rouge">'prov</code> name for the lifetime helps hint
+to future developers that this data is coming from the <code class="language-plaintext highlighter-rouge">Provider</code>.</p>
+
+<p>This kind of situation also commonly arises with arena allocators. Inside the Rust compiler, for instance,
+there’s the extremely common <code class="language-plaintext highlighter-rouge">'tcx</code> lifetime, which is the lifetime of the arena containing the typing
+context for the program. This lifetime appears all over the Rust codebase, and whenever you see <code class="language-plaintext highlighter-rouge">'tcx</code>,
+you’re provided with information about where the reference is coming from, and how long it’ll live.</p>
+
+<h2 id="case-2-multiple-borrow-sources">Case 2: Multiple Borrow Sources</h2>
+
+<p>Sometimes, you may alternatively have a structure which contains borrows of multiple sources. In the
+following example, we use a “view” structure to combine references to multiple places into a single
+structure.</p>
+
+<figure class="figure--code  " id="code-5">
+    <a class="visually-hidden" href="#skip-code-5">Skip this content.</a>
+    
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">Article</span> <span class="p">{</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+    <span class="n">author</span><span class="p">:</span> <span class="n">Author</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="nd">#[derive(PartialEq,</span> <span class="nd">Eq)]</span>
+<span class="k">struct</span> <span class="n">Author</span> <span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">String</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">ArticleProvider</span> <span class="p">{</span>
+    <span class="n">articles</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Article</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">AuthorProvider</span> <span class="p">{</span>
+    <span class="n">authors</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Author</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">AuthorView</span><span class="o">&lt;</span><span class="nv">'art</span><span class="p">,</span> <span class="nv">'auth</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="n">author</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'auth</span> <span class="n">Author</span><span class="p">,</span>
+    <span class="n">articles</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;&amp;</span><span class="nv">'art</span> <span class="n">Article</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="n">authors_with_articles</span><span class="o">&lt;</span><span class="nv">'art</span><span class="p">,</span> <span class="nv">'auth</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="n">article_provider</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'art</span> <span class="n">ArticleProvider</span><span class="p">,</span>
+    <span class="n">author_provider</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'auth</span> <span class="n">AuthorProvider</span><span class="p">,</span>
+<span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">AuthorView</span><span class="o">&lt;</span><span class="nv">'art</span><span class="p">,</span> <span class="nv">'auth</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+    <span class="n">author_provider</span>
+        <span class="py">.authors</span>
+        <span class="nf">.iter</span><span class="p">()</span>
+        <span class="nf">.map</span><span class="p">(|</span><span class="n">author</span><span class="p">|</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="n">articles</span> <span class="o">=</span> <span class="n">article_provider</span>
+                <span class="py">.articles</span>
+                <span class="nf">.iter</span><span class="p">()</span>
+                <span class="nf">.filter</span><span class="p">(|</span><span class="n">article</span><span class="p">|</span> <span class="o">&amp;</span><span class="n">article</span><span class="py">.author</span> <span class="o">==</span> <span class="n">author</span><span class="p">)</span>
+                <span class="nf">.collect</span><span class="p">();</span>
+
+            <span class="n">AuthorView</span> <span class="p">{</span> <span class="n">author</span><span class="p">,</span> <span class="n">articles</span> <span class="p">}</span>
+        <span class="p">})</span>
+        <span class="nf">.collect</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+    <figcaption><span class="figure-opener">Code 5</span> <p>A view structure bundling multiple references together.</p> <a href="#code-5" class="figure-link"><span>↺</span></a></figcaption>
+    <div id="skip-code-5"></div>
+</figure>
+
+<p>In this example, the “view” structure has two lifetimes, to permit the borrows of the respective fields
+to come from different places, and the naming with longer names helps to disambiguate which borrow is which,
+and where it’s coming from.</p>
+
+<p>This example also wouldn’t work without explicitly specifying the lifetimes with
+some sort of name, as the lifetime inference rules do not infer lifetimes for output references when more than
+one input reference exists. This is because there’d be no principle way to infer which input lifetime the
+output lifetime is derived from without inspecting the body of the function, and for performance and clarity
+reasons, the Rust compiler declines to do that sort of in-depth function body analysis.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>There are more cases than these where you might want to use longer lifetime names. They’re not always appropriate,
+but when they are, it’s good to know that they’re possible. Questions of readability are always trade-offs between
+length and clarity, and there’s no hard and fast rule for what’s “right.” Hopefully this post has at least helped
+clarify the situations when you might want to apply this practice.</p>
+
+    </div>
+
+    
+        <div class="discuss">
+            <div class="discuss-content">
+                <section class="discuss-section">
+                    <p><strong>Possible Rust</strong> succeeds when more people can join in learning about Rust! Please take a moment to share, <em>especially</em> if you have questions or if you disagree!</p>
+
+                    <a target="_blank" href="https://twitter.com/intent/tweet?text=https://www.possiblerust.com/pattern/naming-your-lifetimes" class="button button--block">Share on Twitter</a>
+                </section>
+                <section class="discuss-section flex">
+                    
+                        <div class="discuss-empty">
+                            <div>
+                                <p>Will be updated with links to discussions soon!</p>
+                            </div>
+                        </div>
+                    
+                </section>
+            </div>
+        </div>
+    
+
+    <div class="other-posts">
+        
+            <div></div>
         
 
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/pattern/naming-your-lifetimes">Naming Your Lifetimes</a></h3>
-    <div class="post-preview-meta">May 20th, 2021
- &middot;  <a href="/pattern" class="meta">Pattern</a>  
- &middot;  <a href="/tags#lifetimes" class="meta">#lifetimes</a>  </div>
-</div>
-    
         
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/pattern/3-things-to-try-when-you-can-t-make-a-trait-object">3 Things to Try When You Can't Make a Trait Object</a></h3>
-    <div class="post-preview-meta">Feb 2nd, 2021
- &middot;  <a href="/pattern" class="meta">Pattern</a>  
- &middot;  <a href="/tags#trait-objects" class="meta">#trait objects</a>  </div>
-</div>
-    
+            <a href="/pattern/3-things-to-try-when-you-can-t-make-a-trait-object">
+                <span>Older Post</span>
+                <h4>3 Things to Try When You Can't Make a Trait Object</h4>
+            </a>
         
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/guide/how-to-read-rust-functions-part-1">How to Read Rust Functions, Part 1</a></h3>
-    <div class="post-preview-meta">Jan 26th, 2021
- &middot;  <a href="/guide" class="meta">Guide</a>  
- &middot;  <a href="/tags#functions" class="meta">#functions</a>  </div>
-</div>
-    
-        
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/pattern/non-generic-inner-functions">Non-Generic Inner Functions</a></h3>
-    <div class="post-preview-meta">Oct 20th, 2020
- &middot;  <a href="/pattern" class="meta">Pattern</a>  
- &middot;  <a href="/tags#generics" class="meta">#generics</a>  </div>
-</div>
-    
-        
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/community/how-to-read-first-impression-posts">How to Read First Impression Posts</a></h3>
-    <div class="post-preview-meta">Aug 14th, 2020
- &middot;  <a href="/community" class="meta">Community</a>  
- &middot;  <a href="/tags#opinion" class="meta">#opinion</a>  </div>
-</div>
-    
-        
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/guide/inbound-outbound-ffi">Inbound & Outbound FFI</a></h3>
-    <div class="post-preview-meta">Aug 5th, 2020
- &middot;  <a href="/guide" class="meta">Guide</a>  
- &middot;  <a href="/tags#ffi" class="meta">#ffi</a>  </div>
-</div>
-    
-        
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/guide/enum-or-trait-object">Enum or Trait Object</a></h3>
-    <div class="post-preview-meta">Jul 27th, 2020
- &middot;  <a href="/guide" class="meta">Guide</a>  
- &middot;  <a href="/tags#enums" class="meta">#enums</a>,  <a href="/tags#trait-objects" class="meta">#trait objects</a>  </div>
-</div>
-    
-        
-
-<div class="compact-preview">
-    <h3 class="compact-preview-title"><a class="plain" href="/pattern/rust-lints-you-may-not-know">Rust Lints You May Not Know</a></h3>
-    <div class="post-preview-meta">Jun 21st, 2020
- &middot;  <a href="/pattern" class="meta">Pattern</a>  
- &middot;  <a href="/tags#lints" class="meta">#lints</a>  </div>
-</div>
-    
+    </div>
 </div>
 
                 </div>
