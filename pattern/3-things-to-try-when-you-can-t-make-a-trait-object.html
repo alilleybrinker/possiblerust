@@ -25,7 +25,7 @@
         <!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="3 Things to Try When You Can’t Make a Trait Object" />
-<meta name="author" content="Andrew Lilley Brinker" />
+<meta name="author" content="alilleybrinker" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Trait objects are Rust’s usual mechanism for dynamic dispatch, and when they work they’re wonderful, but many Rust programmers have struggled with the question of when a trait can become a trait object, and what to do when a trait they’re using can’t. This post describes several options for handling an inability to create a trait object, discusses their trade-offs, and describes why the trait object limitations exist in the first place, and what those limitations are exactly." />
 <meta property="og:description" content="Trait objects are Rust’s usual mechanism for dynamic dispatch, and when they work they’re wonderful, but many Rust programmers have struggled with the question of when a trait can become a trait object, and what to do when a trait they’re using can’t. This post describes several options for handling an inability to create a trait object, discusses their trade-offs, and describes why the trait object limitations exist in the first place, and what those limitations are exactly." />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"3 Things to Try When You Can’t Make a Trait Object","dateModified":"2021-02-02T15:05:00-08:00","datePublished":"2021-02-02T15:05:00-08:00","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/3-things-to-try-when-you-can-t-make-a-trait-object"},"url":"https://www.possiblerust.com/pattern/3-things-to-try-when-you-can-t-make-a-trait-object","description":"Trait objects are Rust’s usual mechanism for dynamic dispatch, and when they work they’re wonderful, but many Rust programmers have struggled with the question of when a trait can become a trait object, and what to do when a trait they’re using can’t. This post describes several options for handling an inability to create a trait object, discusses their trade-offs, and describes why the trait object limitations exist in the first place, and what those limitations are exactly.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"headline":"3 Things to Try When You Can’t Make a Trait Object","dateModified":"2021-02-02T15:05:00-08:00","datePublished":"2021-02-02T15:05:00-08:00","author":{"@type":"Person","name":"alilleybrinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/3-things-to-try-when-you-can-t-make-a-trait-object"},"url":"https://www.possiblerust.com/pattern/3-things-to-try-when-you-can-t-make-a-trait-object","description":"Trait objects are Rust’s usual mechanism for dynamic dispatch, and when they work they’re wonderful, but many Rust programmers have struggled with the question of when a trait can become a trait object, and what to do when a trait they’re using can’t. This post describes several options for handling an inability to create a trait object, discusses their trade-offs, and describes why the trait object limitations exist in the first place, and what those limitations are exactly.","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -250,6 +250,10 @@
                     <a class="plain" href="/tags#lifetimes">#lifetimes<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#types">#types<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -298,6 +302,8 @@ Feed</a>
                                 Feb 2nd, 2021
  &middot;  <a href="/pattern" class="meta">Pattern</a>  
  &middot;  <a href="/tags#trait-objects" class="meta">#trait objects</a>  
+
+ &middot; By <strong>Andrew Lilley Brinker</strong>
                             </p>
                         
                     
@@ -818,6 +824,26 @@ than I’ve reflected here, and I encourage anyone deeply interested to read the
 
 
     </div>
+
+    
+    
+        <div class="author-block">
+            
+                <div class="media media--right">
+                    <div class="author-image media-figure">
+                        <img src="/assets/authors/alilleybrinker.jpg">
+                    </div>
+                    <div class="media-body">
+            
+                        <h4 class="author-name">Andrew Lilley Brinker</h4><br>
+                        <div class="author-desc"><p>Andrew works on software supply chain security by day and writes educational Rust posts by night. He started Possible Rust in 2020 and can usually be found <a href="https://twitter.com/alilleybrinker">on Twitter</a>.</p>
+</div>
+            
+                    </div>    
+                </div>
+            
+        </div>
+    
 
     
         <div class="discuss">

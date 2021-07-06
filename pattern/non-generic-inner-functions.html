@@ -25,7 +25,7 @@
         <!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v4.2.0" />
 <meta property="og:title" content="Non-Generic Inner Functions" />
-<meta name="author" content="Andrew Lilley Brinker" />
+<meta name="author" content="alilleybrinker" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future." />
 <meta property="og:description" content="Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future." />
@@ -39,7 +39,7 @@
 <meta name="twitter:site" content="@possiblerust" />
 <meta name="twitter:creator" content="@alilleybrinker" />
 <script type="application/ld+json">
-{"headline":"Non-Generic Inner Functions","dateModified":"2020-10-20T18:19:00-07:00","datePublished":"2020-10-20T18:19:00-07:00","author":{"@type":"Person","name":"Andrew Lilley Brinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/non-generic-inner-functions"},"url":"https://www.possiblerust.com/pattern/non-generic-inner-functions","description":"Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future.","@type":"BlogPosting","@context":"https://schema.org"}</script>
+{"headline":"Non-Generic Inner Functions","dateModified":"2020-10-20T18:19:00-07:00","datePublished":"2020-10-20T18:19:00-07:00","author":{"@type":"Person","name":"alilleybrinker"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.possiblerust.com/pattern/non-generic-inner-functions"},"url":"https://www.possiblerust.com/pattern/non-generic-inner-functions","description":"Steve Klabnik recently wrote about whether out parameters are idiomatic in Rust. The post ends by showing a snippet of code: a generic function, with a non-generic function inside of it which contains the actual implementation. Steve says this pattern may warrant its own post, so here is that post, where I’ll explain why this inner function is useful, discuss the trade-offs of doing it, and describe why this pattern will hopefully not be necessary in the future.","@type":"BlogPosting","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
     </head>
@@ -250,6 +250,10 @@
                     <a class="plain" href="/tags#lifetimes">#lifetimes<span>1</span></a>
                 </li>
             
+                <li class="tags-item">
+                    <a class="plain" href="/tags#types">#types<span>1</span></a>
+                </li>
+            
         </ul>
 
         <a class="tags-footer" href="/tags">View all tags</a>
@@ -298,6 +302,8 @@ Feed</a>
                                 Oct 20th, 2020
  &middot;  <a href="/pattern" class="meta">Pattern</a>  
  &middot;  <a href="/tags#generics" class="meta">#generics</a>  
+
+ &middot; By <strong>Andrew Lilley Brinker</strong>
                             </p>
                         
                     
@@ -594,6 +600,26 @@ without causing any problems.</li>
 
 
     </div>
+
+    
+    
+        <div class="author-block">
+            
+                <div class="media media--right">
+                    <div class="author-image media-figure">
+                        <img src="/assets/authors/alilleybrinker.jpg">
+                    </div>
+                    <div class="media-body">
+            
+                        <h4 class="author-name">Andrew Lilley Brinker</h4><br>
+                        <div class="author-desc"><p>Andrew works on software supply chain security by day and writes educational Rust posts by night. He started Possible Rust in 2020 and can usually be found <a href="https://twitter.com/alilleybrinker">on Twitter</a>.</p>
+</div>
+            
+                    </div>    
+                </div>
+            
+        </div>
+    
 
     
         <div class="discuss">
